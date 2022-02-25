@@ -146,14 +146,17 @@ func (p *parser) parseBookmark(start *xml.StartElement) (Bookmark, error) {
 	}
 
 	bookmark := Bookmark{
-		Title: link.Title,
+		Title:      link.Title,
+		Attributes: map[string]string{},
 	}
 
 	for _, attr := range start.Attr {
 		if attr.Name.Local == "HREF" {
 			bookmark.Href = attr.Value
-			break
+			continue
 		}
+
+		bookmark.Attributes[attr.Name.Local] = attr.Value
 	}
 
 	return bookmark, nil

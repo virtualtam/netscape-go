@@ -18,4 +18,5 @@ type Bookmark struct {
 	Href        string
 	Title       string
 	Description string
+	Attributes  map[string]string
 }

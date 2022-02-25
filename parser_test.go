@@ -15,7 +15,7 @@ func TestParse(t *testing.T) {
 	}{
 		// nominal cases
 		{
-			tname: "valid document",
+			tname: "flat document",
 			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <!-- This is an automatically generated file.
      It will be read and overwritten.
@@ -48,6 +48,33 @@ func TestParse(t *testing.T) {
 						{
 							Href:  "https://emptydesc.domain.tld",
 							Title: "Test Domain (with empty description)",
+						},
+					},
+				},
+			},
+		},
+		{
+			tname: "bookmark with attributes",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+    <DT><A HREF="https://domain.tld" ADD_DATE="151637044" PRIVATE="1" TAGS="test tags">Test Domain</A>
+</DL><p>
+`,
+			want: File{
+				Title: "Bookmarks",
+				Root: Folder{
+					Name: "Bookmarks",
+					Bookmarks: []Bookmark{
+						{
+							Href:  "https://domain.tld",
+							Title: "Test Domain",
+							Attributes: map[string]string{
+								"ADD_DATE": "151637044",
+								"PRIVATE":  "1",
+								"TAGS":     "test tags",
+							},
 						},
 					},
 				},
@@ -128,6 +155,10 @@ func TestParse(t *testing.T) {
 
 				if got.Root.Bookmarks[index].Title != wantBookmark.Title {
 					t.Errorf("want bookmark %d title %q, got %q", index, wantBookmark.Title, got.Root.Bookmarks[index].Title)
+				}
+
+				if len(got.Root.Bookmarks[index].Attributes) != len(wantBookmark.Attributes) {
+					t.Errorf("want %d attributes for bookmark %d, got %d", len(wantBookmark.Attributes), index, len(got.Root.Bookmarks[index].Attributes))
 				}
 			}
 		})
