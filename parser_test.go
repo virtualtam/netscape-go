@@ -16,7 +16,16 @@ func TestParse(t *testing.T) {
 		// nominal cases
 		{
 			tname: "valid document",
-			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n`,
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<!-- This is an automatically generated file.
+     It will be read and overwritten.
+     DO NOT EDIT! -->
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Bookmarks</TITLE>
+`,
+			want: File{
+				Title: "Bookmarks",
+			},
 		},
 
 		// error cases
@@ -34,13 +43,19 @@ func TestParse(t *testing.T) {
 			input:   `<!DOCTYPE dummy SYSTEM "dummy.dtd">`,
 			wantErr: ErrDoctypeInvalid,
 		},
+		{
+			tname: "incomplete TITLE",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks`,
+			wantErr: ErrTokenUnexpected,
+		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.tname, func(t *testing.T) {
 			r := strings.NewReader(tc.input)
 
-			_, err := Parse(r)
+			got, err := Parse(r)
 
 			if tc.wantErr != nil {
 				if err == nil {
@@ -54,6 +69,10 @@ func TestParse(t *testing.T) {
 
 			if err != nil {
 				t.Errorf("expected no error, got %q", err)
+			}
+
+			if got.Title != tc.want.Title {
+				t.Errorf("want title %q, got %q", tc.want.Title, got.Title)
 			}
 		})
 	}
