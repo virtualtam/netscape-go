@@ -1,16 +1,18 @@
-package netscape
+package parser
 
 import (
 	"errors"
 	"strings"
 	"testing"
+
+	"github.com/virtualtam/netscape-go/ast"
 )
 
 func TestParse(t *testing.T) {
 	cases := []struct {
 		tname   string
 		input   string
-		want    File
+		want    ast.File
 		wantErr error
 	}{
 		// nominal cases
@@ -31,11 +33,11 @@ func TestParse(t *testing.T) {
 <DD>
 </DL><p>
 `,
-			want: File{
+			want: ast.File{
 				Title: "Bookmarks",
-				Root: Folder{
+				Root: ast.Folder{
 					Name: "Bookmarks",
-					Bookmarks: []Bookmark{
+					Bookmarks: []ast.Bookmark{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -62,11 +64,11 @@ func TestParse(t *testing.T) {
     <DT><A HREF="https://domain.tld" ADD_DATE="151637044" PRIVATE="1" TAGS="test tags">Test Domain</A>
 </DL><p>
 `,
-			want: File{
+			want: ast.File{
 				Title: "Bookmarks",
-				Root: Folder{
+				Root: ast.Folder{
 					Name: "Bookmarks",
-					Bookmarks: []Bookmark{
+					Bookmarks: []ast.Bookmark{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -96,11 +98,11 @@ func TestParse(t *testing.T) {
 - item 3
 </DL><p>
 `,
-			want: File{
+			want: ast.File{
 				Title: "Bookmarks",
-				Root: Folder{
+				Root: ast.Folder{
 					Name: "Bookmarks",
-					Bookmarks: []Bookmark{
+					Bookmarks: []ast.Bookmark{
 						{
 							Description: "Description:\n\n- item 1\n    - item 1.1\n    - item 1.2\n- item 2\n- item 3",
 							Href:        "https://domain.tld",
@@ -127,14 +129,14 @@ func TestParse(t *testing.T) {
 	</DL><p>
 </DL><p>
 `,
-			want: File{
+			want: ast.File{
 				Title: "Bookmarks",
-				Root: Folder{
+				Root: ast.Folder{
 					Name: "Level 0",
-					Subfolders: []Folder{
+					Subfolders: []ast.Folder{
 						{
 							Name: "Level 1A",
-							Subfolders: []Folder{
+							Subfolders: []ast.Folder{
 								{Name: "Level 2A"},
 							},
 						},
@@ -164,24 +166,24 @@ func TestParse(t *testing.T) {
 	</DL><p>
 </DL><p>
 `,
-			want: File{
+			want: ast.File{
 				Title: "Bookmarks",
-				Root: Folder{
+				Root: ast.Folder{
 					Name: "Level 0",
-					Bookmarks: []Bookmark{
+					Bookmarks: []ast.Bookmark{
 						{Href: "https://l0.domain.tld", Title: "Level 0"},
 						{Href: "https://l0.domain.tld", Title: "Level 0"},
 					},
-					Subfolders: []Folder{
+					Subfolders: []ast.Folder{
 						{
 							Name: "Level 1A",
-							Bookmarks: []Bookmark{
+							Bookmarks: []ast.Bookmark{
 								{Href: "https://l1a.domain.tld", Title: "Level 1A"},
 							},
-							Subfolders: []Folder{
+							Subfolders: []ast.Folder{
 								{
 									Name: "Level 2A",
-									Bookmarks: []Bookmark{
+									Bookmarks: []ast.Bookmark{
 										{Href: "https://l2a.domain.tld", Title: "Level 2A"},
 									},
 								},
@@ -253,7 +255,7 @@ func TestParse(t *testing.T) {
 	}
 }
 
-func assertFoldersEqual(t *testing.T, got Folder, want Folder) {
+func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 	t.Helper()
 
 	if got.Name != want.Name {

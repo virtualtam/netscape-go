@@ -1,4 +1,4 @@
-package netscape
+package parser
 
 import (
 	"encoding/xml"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/virtualtam/netscape-go/ast"
 )
 
 const (
@@ -14,21 +16,21 @@ const (
 
 // Parse reads a Netscape Bookmark document and processes token by token to
 // build and return the corresponding AST.
-func Parse(reader io.Reader) (*File, error) {
+func Parse(reader io.Reader) (*ast.File, error) {
 	p := newParser(reader)
 	return p.parse()
 }
 
 type parser struct {
 	decoder         *xml.Decoder
-	file            *File
-	currentFolder   *Folder
-	currentBookmark *Bookmark
+	file            *ast.File
+	currentFolder   *ast.Folder
+	currentBookmark *ast.Bookmark
 }
 
 func newParser(reader io.Reader) *parser {
 	decoder := newDecoder(reader)
-	file := &File{}
+	file := &ast.File{}
 
 	return &parser{
 		decoder: decoder,
@@ -36,9 +38,9 @@ func newParser(reader io.Reader) *parser {
 	}
 }
 
-func (p *parser) parse() (*File, error) {
+func (p *parser) parse() (*ast.File, error) {
 	if err := p.verifyDoctype(); err != nil {
-		return &File{}, err
+		return &ast.File{}, err
 	}
 
 	for {
@@ -52,19 +54,19 @@ func (p *parser) parse() (*File, error) {
 			switch tokType.Name.Local {
 			case "TITLE":
 				if err := p.parseTitle(&tokType); err != nil {
-					return &File{}, err
+					return &ast.File{}, err
 				}
 			case "H1":
 				folder, err := p.parseFolder(&tokType)
 				if err != nil {
-					return &File{}, err
+					return &ast.File{}, err
 				}
 
 				p.file.Root = folder
 				p.currentFolder = &p.file.Root
 			case "DL":
 				if err := p.parseBookmarks(&tokType); err != nil {
-					return &File{}, err
+					return &ast.File{}, err
 				}
 			}
 		}
@@ -87,16 +89,16 @@ func (p *parser) parseTitle(start *xml.StartElement) error {
 	return nil
 }
 
-func (p *parser) parseFolder(start *xml.StartElement) (Folder, error) {
+func (p *parser) parseFolder(start *xml.StartElement) (ast.Folder, error) {
 	var folder struct {
 		Name string `xml:",chardata"`
 	}
 
 	if err := p.decoder.DecodeElement(&folder, start); err != nil {
-		return Folder{}, ErrTokenUnexpected
+		return ast.Folder{}, ErrTokenUnexpected
 	}
 
-	return Folder{Name: folder.Name}, nil
+	return ast.Folder{Name: folder.Name}, nil
 }
 
 func (p *parser) parseBookmarks(start *xml.StartElement) error {
@@ -128,13 +130,13 @@ func (p *parser) parseBookmarks(start *xml.StartElement) error {
 					return err
 				}
 
-				folder.parent = p.currentFolder
+				folder.Parent = p.currentFolder
 				p.currentFolder.Subfolders = append(p.currentFolder.Subfolders, folder)
 				p.currentFolder = &p.currentFolder.Subfolders[len(p.currentFolder.Subfolders)-1]
 			}
 		case xml.EndElement:
 			if tokType.Name.Local == "DL" {
-				p.currentFolder = p.currentFolder.parent
+				p.currentFolder = p.currentFolder.Parent
 			}
 		}
 	}
@@ -142,16 +144,16 @@ func (p *parser) parseBookmarks(start *xml.StartElement) error {
 	return nil
 }
 
-func (p *parser) parseBookmark(start *xml.StartElement) (Bookmark, error) {
+func (p *parser) parseBookmark(start *xml.StartElement) (ast.Bookmark, error) {
 	var link struct {
 		Title string `xml:",chardata"`
 	}
 
 	if err := p.decoder.DecodeElement(&link, start); err != nil {
-		return Bookmark{}, ErrTokenUnexpected
+		return ast.Bookmark{}, ErrTokenUnexpected
 	}
 
-	bookmark := Bookmark{
+	bookmark := ast.Bookmark{
 		Title:      link.Title,
 		Attributes: map[string]string{},
 	}

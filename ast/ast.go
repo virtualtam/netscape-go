@@ -1,4 +1,4 @@
-package netscape
+package ast
 
 // A File Node represents a Netscape Bookmark file.
 type File struct {
@@ -9,7 +9,7 @@ type File struct {
 // A Folder Node represents a bookmark (sub-)folder that may contain Bookmarks
 // and child Folders.
 type Folder struct {
-	parent *Folder
+	Parent *Folder
 
 	Name       string
 	Bookmarks  []Bookmark

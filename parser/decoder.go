@@ -1,4 +1,4 @@
-package netscape
+package parser
 
 import (
 	"encoding/xml"
