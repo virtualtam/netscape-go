@@ -20,12 +20,14 @@ func Parse(reader io.Reader) (*File, error) {
 }
 
 type parser struct {
-	decoder *xml.Decoder
-	file    *File
+	decoder         *xml.Decoder
+	file            *File
+	currentFolder   *Folder
+	currentBookmark *Bookmark
 }
 
 func newParser(reader io.Reader) *parser {
-	decoder := xml.NewDecoder(reader)
+	decoder := newDecoder(reader)
 	file := &File{}
 
 	return &parser{
@@ -59,13 +61,11 @@ func (p *parser) parse() (*File, error) {
 				}
 
 				p.file.Root = folder
+				p.currentFolder = &p.file.Root
 			case "DL":
-				bookmarks, err := p.parseBookmarks(&tokType)
-				if err != nil {
+				if err := p.parseBookmarks(&tokType); err != nil {
 					return &File{}, err
 				}
-
-				p.file.Root.Bookmarks = bookmarks
 			}
 		}
 	}
@@ -99,10 +99,7 @@ func (p *parser) parseFolder(start *xml.StartElement) (Folder, error) {
 	return Folder{Name: folder.Name}, nil
 }
 
-func (p *parser) parseBookmarks(start *xml.StartElement) ([]Bookmark, error) {
-	bookmarks := []Bookmark{}
-	currentBookmarkIndex := -1
-
+func (p *parser) parseBookmarks(start *xml.StartElement) error {
 	for {
 		tok, err := p.decoder.Token()
 		if tok == nil || errors.Is(err, io.EOF) {
@@ -115,25 +112,34 @@ func (p *parser) parseBookmarks(start *xml.StartElement) ([]Bookmark, error) {
 			case "A":
 				bookmark, err := p.parseBookmark(&tokType)
 				if err != nil {
-					return []Bookmark{}, err
+					return err
 				}
-				bookmarks = append(bookmarks, bookmark)
-				currentBookmarkIndex++
+				p.currentFolder.Bookmarks = append(p.currentFolder.Bookmarks, bookmark)
+				p.currentBookmark = &p.currentFolder.Bookmarks[len(p.currentFolder.Bookmarks)-1]
 			case "DD":
 				description, err := p.parseBookmarkDescription()
 				if err != nil {
-					return []Bookmark{}, err
+					return err
 				}
-				bookmarks[currentBookmarkIndex].Description = description
+				p.currentBookmark.Description = description
+			case "H3":
+				folder, err := p.parseFolder(&tokType)
+				if err != nil {
+					return err
+				}
+
+				folder.parent = p.currentFolder
+				p.currentFolder.Subfolders = append(p.currentFolder.Subfolders, folder)
+				p.currentFolder = &p.currentFolder.Subfolders[len(p.currentFolder.Subfolders)-1]
 			}
 		case xml.EndElement:
 			if tokType.Name.Local == "DL" {
-				return bookmarks, nil
+				p.currentFolder = p.currentFolder.parent
 			}
 		}
 	}
 
-	return bookmarks, nil
+	return nil
 }
 
 func (p *parser) parseBookmark(start *xml.StartElement) (Bookmark, error) {

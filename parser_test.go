@@ -80,6 +80,88 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			tname: "nested folders",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Level 0</H1>
+<DL><p>
+    <DT><H3>Level 1A</H3>
+	<DL><p>
+        <DT><H3>Level 2A</H3>
+	    <DL><p>
+	    </DL><p>
+	</DL><p>
+    <DT><H3>Level 1B</H3>
+	<DL><p>
+	</DL><p>
+</DL><p>
+`,
+			want: File{
+				Title: "Bookmarks",
+				Root: Folder{
+					Name: "Level 0",
+					Subfolders: []Folder{
+						{
+							Name: "Level 1A",
+							Subfolders: []Folder{
+								{Name: "Level 2A"},
+							},
+						},
+						{Name: "Level 1B"},
+					},
+				},
+			},
+		},
+		{
+			tname: "nested folders with bookmarks",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Level 0</H1>
+<DL><p>
+    <DT><A HREF="https://l0.domain.tld">Level 0</A>
+    <DT><A HREF="https://l0.domain.tld">Level 0</A>
+    <DT><H3>Level 1A</H3>
+	<DL><p>
+		<DT><A HREF="https://l1a.domain.tld">Level 1A</A>
+        <DT><H3>Level 2A</H3>
+	    <DL><p>
+		    <DT><A HREF="https://l2a.domain.tld">Level 2A</A>
+	    </DL><p>
+	</DL><p>
+    <DT><H3>Level 1B</H3>
+	<DL><p>
+	</DL><p>
+</DL><p>
+`,
+			want: File{
+				Title: "Bookmarks",
+				Root: Folder{
+					Name: "Level 0",
+					Bookmarks: []Bookmark{
+						{Href: "https://l0.domain.tld", Title: "Level 0"},
+						{Href: "https://l0.domain.tld", Title: "Level 0"},
+					},
+					Subfolders: []Folder{
+						{
+							Name: "Level 1A",
+							Bookmarks: []Bookmark{
+								{Href: "https://l1a.domain.tld", Title: "Level 1A"},
+							},
+							Subfolders: []Folder{
+								{
+									Name: "Level 2A",
+									Bookmarks: []Bookmark{
+										{Href: "https://l2a.domain.tld", Title: "Level 2A"},
+									},
+								},
+							},
+						},
+						{Name: "Level 1B"},
+					},
+				},
+			},
+		},
 
 		// error cases
 		{
@@ -129,38 +211,54 @@ func TestParse(t *testing.T) {
 
 			if err != nil {
 				t.Errorf("expected no error, got %q", err)
+				return
 			}
 
 			if got.Title != tc.want.Title {
 				t.Errorf("want title %q, got %q", tc.want.Title, got.Title)
 			}
 
-			if got.Root.Name != tc.want.Root.Name {
-				t.Errorf("want root folder name %q, got %q", tc.want.Root.Name, got.Root.Name)
-			}
-
-			if len(got.Root.Bookmarks) != len(tc.want.Root.Bookmarks) {
-				t.Errorf("want %d bookmarks in the root folder, got %d", len(tc.want.Root.Bookmarks), len(got.Root.Bookmarks))
-				return
-			}
-
-			for index, wantBookmark := range tc.want.Root.Bookmarks {
-				if got.Root.Bookmarks[index].Description != wantBookmark.Description {
-					t.Errorf("want bookmark %d description %q, got %q", index, wantBookmark.Description, got.Root.Bookmarks[index].Description)
-				}
-
-				if got.Root.Bookmarks[index].Href != wantBookmark.Href {
-					t.Errorf("want bookmark %d href %q, got %q", index, wantBookmark.Href, got.Root.Bookmarks[index].Href)
-				}
-
-				if got.Root.Bookmarks[index].Title != wantBookmark.Title {
-					t.Errorf("want bookmark %d title %q, got %q", index, wantBookmark.Title, got.Root.Bookmarks[index].Title)
-				}
-
-				if len(got.Root.Bookmarks[index].Attributes) != len(wantBookmark.Attributes) {
-					t.Errorf("want %d attributes for bookmark %d, got %d", len(wantBookmark.Attributes), index, len(got.Root.Bookmarks[index].Attributes))
-				}
-			}
+			assertFoldersEqual(t, got.Root, tc.want.Root)
 		})
+	}
+}
+
+func assertFoldersEqual(t *testing.T, got Folder, want Folder) {
+	t.Helper()
+
+	if got.Name != want.Name {
+		t.Errorf("want root folder name %q, got %q", want.Name, got.Name)
+	}
+
+	if len(got.Bookmarks) != len(want.Bookmarks) {
+		t.Errorf("want %d bookmarks in the root folder, got %d", len(want.Bookmarks), len(got.Bookmarks))
+		return
+	}
+
+	for index, wantBookmark := range want.Bookmarks {
+		if got.Bookmarks[index].Description != wantBookmark.Description {
+			t.Errorf("want bookmark %d description %q, got %q", index, wantBookmark.Description, got.Bookmarks[index].Description)
+		}
+
+		if got.Bookmarks[index].Href != wantBookmark.Href {
+			t.Errorf("want bookmark %d href %q, got %q", index, wantBookmark.Href, got.Bookmarks[index].Href)
+		}
+
+		if got.Bookmarks[index].Title != wantBookmark.Title {
+			t.Errorf("want bookmark %d title %q, got %q", index, wantBookmark.Title, got.Bookmarks[index].Title)
+		}
+
+		if len(got.Bookmarks[index].Attributes) != len(wantBookmark.Attributes) {
+			t.Errorf("want %d attributes for bookmark %d, got %d", len(wantBookmark.Attributes), index, len(got.Bookmarks[index].Attributes))
+		}
+	}
+
+	if len(got.Subfolders) != len(want.Subfolders) {
+		t.Errorf("want %d subfolders, got %d", len(want.Subfolders), len(got.Subfolders))
+		return
+	}
+
+	for index, wantSubfolder := range want.Subfolders {
+		assertFoldersEqual(t, got.Subfolders[index], wantSubfolder)
 	}
 }
