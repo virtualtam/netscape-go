@@ -81,6 +81,36 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			tname: "bookmark with multi-line description",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+<DT><A HREF="https://domain.tld">Test Domain</A>
+<DD>Description:
+
+- item 1
+    - item 1.1
+    - item 1.2
+- item 2
+- item 3
+</DL><p>
+`,
+			want: File{
+				Title: "Bookmarks",
+				Root: Folder{
+					Name: "Bookmarks",
+					Bookmarks: []Bookmark{
+						{
+							Description: "Description:\n\n- item 1\n    - item 1.1\n    - item 1.2\n- item 2\n- item 3",
+							Href:        "https://domain.tld",
+							Title:       "Test Domain",
+						},
+					},
+				},
+			},
+		},
+		{
 			tname: "nested folders",
 			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <TITLE>Bookmarks</TITLE>
