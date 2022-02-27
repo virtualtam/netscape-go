@@ -11,9 +11,10 @@ type File struct {
 type Folder struct {
 	Parent *Folder
 
-	Name       string
-	Bookmarks  []Bookmark
-	Subfolders []Folder
+	Name        string
+	Description string
+	Bookmarks   []Bookmark
+	Subfolders  []Folder
 }
 
 // A Bookmark Node represents a Netscape bookmark.

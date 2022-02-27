@@ -104,6 +104,8 @@ func (p *parser) parseFolder(start *xml.StartElement) (ast.Folder, error) {
 }
 
 func (p *parser) parseBookmarks(start *xml.StartElement) error {
+	var lastElementType string
+
 	for {
 		tok, err := p.decoder.Token()
 		if tok == nil || errors.Is(err, io.EOF) {
@@ -120,12 +122,19 @@ func (p *parser) parseBookmarks(start *xml.StartElement) error {
 				}
 				p.currentFolder.Bookmarks = append(p.currentFolder.Bookmarks, bookmark)
 				p.currentBookmark = &p.currentFolder.Bookmarks[len(p.currentFolder.Bookmarks)-1]
+				lastElementType = "A"
 			case "DD":
-				description, err := p.parseBookmarkDescription()
+				description, err := p.parseDescription()
 				if err != nil {
 					return err
 				}
-				p.currentBookmark.Description = description
+
+				switch lastElementType {
+				case "A":
+					p.currentBookmark.Description = description
+				case "H3":
+					p.currentFolder.Description = description
+				}
 			case "H3":
 				folder, err := p.parseFolder(&tokType)
 				if err != nil {
@@ -135,6 +144,7 @@ func (p *parser) parseBookmarks(start *xml.StartElement) error {
 				folder.Parent = p.currentFolder
 				p.currentFolder.Subfolders = append(p.currentFolder.Subfolders, folder)
 				p.currentFolder = &p.currentFolder.Subfolders[len(p.currentFolder.Subfolders)-1]
+				lastElementType = "H3"
 			}
 		case xml.EndElement:
 			if tokType.Name.Local == "DL" {
@@ -172,13 +182,13 @@ func (p *parser) parseBookmark(start *xml.StartElement) (ast.Bookmark, error) {
 	return bookmark, nil
 }
 
-// parseBookmarkDescription returns a string containing all data following a
-// <DD> element, and preceding either a <DT> or </DL> element.
+// parseDescription returns a string containing all data following a <DD>
+// element, and preceding either a <DT> or </DL> element.
 //
 // Leading and trailing whitespace is trimmed from the returned string.
 //
 // A description may contain text and HTML elements.
-func (p *parser) parseBookmarkDescription() (string, error) {
+func (p *parser) parseDescription() (string, error) {
 	startOffset := p.decoder.InputOffset()
 	endOffset := startOffset
 	retOffset := startOffset
@@ -197,7 +207,7 @@ loop:
 		case xml.CharData:
 			endOffset = p.decoder.InputOffset()
 		case xml.StartElement:
-			if tokType.Name.Local == "DT" {
+			if tokType.Name.Local == "DL" || tokType.Name.Local == "DT" {
 				retOffset = p.decoder.InputOffset()
 				break loop
 			}

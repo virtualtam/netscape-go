@@ -255,6 +255,38 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			tname: "nested folder with description and bookmarks",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Level 0</H1>
+<DL><p>
+    <DT><H3>Level 1</H3>
+    <DD>Folder with description
+    <DL><p>
+        <DT><A HREF="https://domain.tld">Test Domain</A>
+    </DL><p>
+</DL><p>
+`,
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Level 0",
+					Subfolders: []ast.Folder{
+						{
+							Name:        "Level 1",
+							Description: "Folder with description",
+							Bookmarks: []ast.Bookmark{
+								{
+									Href:  "https://domain.tld",
+									Title: "Test Domain",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 
 		// error cases
 		{
@@ -320,7 +352,11 @@ func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 	t.Helper()
 
 	if got.Name != want.Name {
-		t.Errorf("want root folder name %q, got %q", want.Name, got.Name)
+		t.Errorf("want folder name %q, got %q", want.Name, got.Name)
+	}
+
+	if got.Description != want.Description {
+		t.Errorf("want folder description %q, got %q", want.Description, got.Description)
 	}
 
 	if len(got.Bookmarks) != len(want.Bookmarks) {
