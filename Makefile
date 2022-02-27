@@ -1,3 +1,10 @@
+all: lint cover
+.PHONY: all
+
+lint:
+	golangci-lint run ./...
+.PHONY: lint
+
 test:
 	go test ./...
 .PHONY: test
