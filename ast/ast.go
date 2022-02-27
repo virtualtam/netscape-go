@@ -13,8 +13,10 @@ type Folder struct {
 
 	Name        string
 	Description string
-	Bookmarks   []Bookmark
-	Subfolders  []Folder
+	Attributes  map[string]string
+
+	Bookmarks  []Bookmark
+	Subfolders []Folder
 }
 
 // A Bookmark Node represents a Netscape bookmark.

@@ -92,15 +92,24 @@ func (p *parser) parseTitle(start *xml.StartElement) error {
 }
 
 func (p *parser) parseFolder(start *xml.StartElement) (ast.Folder, error) {
-	var folder struct {
+	var elt struct {
 		Name string `xml:",chardata"`
 	}
 
-	if err := p.decoder.DecodeElement(&folder, start); err != nil {
+	if err := p.decoder.DecodeElement(&elt, start); err != nil {
 		return ast.Folder{}, ErrTokenUnexpected
 	}
 
-	return ast.Folder{Name: folder.Name}, nil
+	folder := ast.Folder{
+		Name:       elt.Name,
+		Attributes: map[string]string{},
+	}
+
+	for _, attr := range start.Attr {
+		folder.Attributes[attr.Name.Local] = attr.Value
+	}
+
+	return folder, nil
 }
 
 func (p *parser) parseBookmarks(start *xml.StartElement) error {

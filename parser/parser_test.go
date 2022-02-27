@@ -256,6 +256,36 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			tname: "nested folder with attributes",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+    <DT><H3 ADD_DATE="1460294955" LAST_MODIFIED="1460294956" PERSONAL_TOOLBAR_FOLDER="true">Personal toolbar</H3>
+	<DD>Add bookmarks to this folder to see them displayed on the Bookmarks Toolbar
+	<DL><p>
+	</DL><p>
+</DL><p>
+`,
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Bookmarks",
+					Subfolders: []ast.Folder{
+						{
+							Name:        "Personal toolbar",
+							Description: "Add bookmarks to this folder to see them displayed on the Bookmarks Toolbar",
+							Attributes: map[string]string{
+								"ADD_DATE":                "1460294955",
+								"LAST_MODIFIED":           "1460294956",
+								"PERSONAL_TOOLBAR_FOLDER": "true",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			tname: "nested folder with description and bookmarks",
 			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <TITLE>Bookmarks</TITLE>
@@ -359,8 +389,19 @@ func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 		t.Errorf("want folder description %q, got %q", want.Description, got.Description)
 	}
 
+	if len(got.Attributes) != len(want.Attributes) {
+		t.Errorf("want %d attributes for folder %q, got %d", len(want.Attributes), want.Name, len(got.Attributes))
+		return
+	}
+
+	for name, wantValue := range want.Attributes {
+		if got.Attributes[name] != wantValue {
+			t.Errorf("want folder %q attribute %q value %q, got %q", want.Name, name, wantValue, got.Attributes[name])
+		}
+	}
+
 	if len(got.Bookmarks) != len(want.Bookmarks) {
-		t.Errorf("want %d bookmarks in the root folder, got %d", len(want.Bookmarks), len(got.Bookmarks))
+		t.Errorf("want %d bookmarks in folder %q, got %d", len(want.Bookmarks), want.Name, len(got.Bookmarks))
 		return
 	}
 
@@ -383,7 +424,7 @@ func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 	}
 
 	if len(got.Subfolders) != len(want.Subfolders) {
-		t.Errorf("want %d subfolders, got %d", len(want.Subfolders), len(got.Subfolders))
+		t.Errorf("want %d subfolders for folder %q, got %d", len(want.Subfolders), want.Name, len(got.Subfolders))
 		return
 	}
 
