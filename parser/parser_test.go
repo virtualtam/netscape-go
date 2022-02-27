@@ -83,6 +83,41 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			tname: "bookmark with empty description",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+<DT><A HREF="https://domain.tld">Test Domain</A>
+<DD>
+<DT><A HREF="https://domain.tld">Test Domain</A>
+<DD>
+<DT><A HREF="https://emptydesc.domain.tld">Test Domain (with empty description)</A>
+<DD>
+</DL><p>
+`,
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Bookmarks",
+					Bookmarks: []ast.Bookmark{
+						{
+							Href:  "https://domain.tld",
+							Title: "Test Domain",
+						},
+						{
+							Href:  "https://domain.tld",
+							Title: "Test Domain",
+						},
+						{
+							Href:  "https://emptydesc.domain.tld",
+							Title: "Test Domain (with empty description)",
+						},
+					},
+				},
+			},
+		},
+		{
 			tname: "bookmark with multi-line description",
 			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <TITLE>Bookmarks</TITLE>
@@ -107,6 +142,32 @@ func TestParse(t *testing.T) {
 							Description: "Description:\n\n- item 1\n    - item 1.1\n    - item 1.2\n- item 2\n- item 3",
 							Href:        "https://domain.tld",
 							Title:       "Test Domain",
+						},
+					},
+				},
+			},
+		},
+		{
+			tname: "bookmark with description containing HTML markup",
+			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+<DT><A HREF="https://domain.tld">Test Domain</A>
+<DD>Markup:
+<a href="http://localhost:8080"><img src="http://localhost:8080/splash.png"/></a>
+</DL><p>
+`,
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Bookmarks",
+					Bookmarks: []ast.Bookmark{
+						{
+							Description: `Markup:
+<a href="http://localhost:8080"><img src="http://localhost:8080/splash.png"/></a>`,
+							Href:  "https://domain.tld",
+							Title: "Test Domain",
 						},
 					},
 				},

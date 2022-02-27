@@ -16,25 +16,27 @@ const (
 
 // Parse reads a Netscape Bookmark document and processes token by token to
 // build and return the corresponding AST.
-func Parse(reader io.Reader) (*ast.File, error) {
-	p := newParser(reader)
+func Parse(readseeker io.ReadSeeker) (*ast.File, error) {
+	p := newParser(readseeker)
 	return p.parse()
 }
 
 type parser struct {
+	readseeker      io.ReadSeeker
 	decoder         *xml.Decoder
 	file            *ast.File
 	currentFolder   *ast.Folder
 	currentBookmark *ast.Bookmark
 }
 
-func newParser(reader io.Reader) *parser {
-	decoder := newDecoder(reader)
+func newParser(readseeker io.ReadSeeker) *parser {
+	decoder := newDecoder(readseeker)
 	file := &ast.File{}
 
 	return &parser{
-		decoder: decoder,
-		file:    file,
+		readseeker: readseeker,
+		decoder:    decoder,
+		file:       file,
 	}
 }
 
@@ -170,20 +172,72 @@ func (p *parser) parseBookmark(start *xml.StartElement) (ast.Bookmark, error) {
 	return bookmark, nil
 }
 
+// parseBookmarkDescription returns a string containing all data following a
+// <DD> element, and preceding either a <DT> or </DL> element.
+//
+// Leading and trailing whitespace is trimmed from the returned string.
+//
+// A description may contain text and HTML elements.
 func (p *parser) parseBookmarkDescription() (string, error) {
-	tok, err := p.decoder.Token()
-	if tok == nil || errors.Is(err, io.EOF) {
-		return "", ErrEOFUnexpected
+	startOffset := p.decoder.InputOffset()
+	endOffset := startOffset
+	retOffset := startOffset
+
+	// As the description may contain either text or HTML elements, we do not
+	// directly process the stream of XML tokens, and instead look for the start
+	// and end offsets of the description data in the underlying io.ReadSeeker.
+loop:
+	for {
+		tok, err := p.decoder.Token()
+		if tok == nil || errors.Is(err, io.EOF) {
+			return "", ErrEOFUnexpected
+		}
+
+		switch tokType := tok.(type) {
+		case xml.CharData:
+			endOffset = p.decoder.InputOffset()
+		case xml.StartElement:
+			if tokType.Name.Local == "DT" {
+				retOffset = p.decoder.InputOffset()
+				break loop
+			}
+		case xml.EndElement:
+			if tokType.Name.Local == "DD" || tokType.Name.Local == "DL" {
+				retOffset = p.decoder.InputOffset()
+				break loop
+			}
+
+			endOffset = p.decoder.InputOffset()
+		}
 	}
 
-	switch tokType := tok.(type) {
-	case xml.CharData:
-		description := string(tokType)
-		description = strings.TrimSpace(description)
-		return description, nil
+	// read raw data between start and end offsets
+	dataLen := int(endOffset - startOffset)
+
+	data := make([]byte, dataLen)
+	_, err := p.readseeker.Seek(startOffset, io.SeekStart)
+	if err != nil {
+		return "", err
 	}
 
-	return "", ErrTokenUnexpected
+	nRead, err := p.readseeker.Read(data)
+	if err != nil {
+		return "", err
+	}
+
+	if nRead != dataLen {
+		return "", fmt.Errorf("description: expected to read %d bytes, read %d", dataLen, nRead)
+	}
+
+	// reset the io.ReadSeeker position
+	_, err = p.readseeker.Seek(retOffset, io.SeekStart)
+	if err != nil {
+		return "", err
+	}
+
+	// sanitize data
+	description := strings.TrimSpace(string(data))
+	return description, nil
 }
 
 func (p *parser) verifyDoctype() error {
