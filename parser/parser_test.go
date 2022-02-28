@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -378,6 +379,243 @@ func TestParse(t *testing.T) {
 	}
 }
 
+func TestParseFile(t *testing.T) {
+	cases := []struct {
+		tname         string
+		inputFilename string
+		want          ast.File
+	}{
+		{
+			tname:         "Netscape (basic)",
+			inputFilename: "netscape_basic.htm",
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Bookmarks",
+					Bookmarks: []ast.Bookmark{
+						{
+							Description: "Super-secret stuff you're not supposed to know about",
+							Href:        "https://private.tld",
+							Title:       "Secret stuff",
+							Attributes: map[string]string{
+								"ADD_DATE": "10/Oct/2000:13:55:36 +0300",
+								"PRIVATE":  "1",
+								"TAGS":     "private secret",
+							},
+						},
+						{
+							Href:  "http://public.tld",
+							Title: "Public stuff",
+							Attributes: map[string]string{
+								"ADD_DATE": "1456433748",
+								"PRIVATE":  "0",
+								"TAGS":     "public hello world",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			tname:         "Netscape (extended markup)",
+			inputFilename: "netscape_extended.htm",
+			want: ast.File{
+				Title: "My local links",
+				Root: ast.Folder{
+					Name: "Shaarli export of all bookmarks on Sat, 06 Jun 20 15:50:59 +0200",
+					Bookmarks: []ast.Bookmark{
+						{
+							Description: `For 10 years, a rogue fishing vessel and its crew plundered the world’s oceans, escaping repeated attempts of capture. Then a dramatic pursuit finally netted the one that got away.
+<a href="http://localhost.localdomain:8083/Shaarli/?JVvqCA"><img src="http://localhost.localdomain:8083/Shaarli/cache/thumb/290ccda0deea6083ee613d358446103e/c975558ad43acdbd982ffafd8c01163d6c9ec5ca125901.jpg"/></a>`,
+							Href:  "https://www.bbc.com/future/article/20190213-the-dramatic-hunt-for-the-fish-pirates-exploiting-our-seas",
+							Title: "The hunt for the fish pirates who exploit the sea - BBC Future",
+							Attributes: map[string]string{
+								"ADD_DATE": "1591451445",
+								"PRIVATE":  "1",
+								"TAGS":     "story,oceans",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			tname:         "Netscape (multiline descriptions)",
+			inputFilename: "netscape_multiline.htm",
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Bookmarks",
+					Bookmarks: []ast.Bookmark{
+						{
+							Description: "List:\n- item1\n- item2\n- item3",
+							Href:        "http://multi.li.ne/1",
+							Title:       "Multiline desc",
+							Attributes: map[string]string{
+								"ADD_DATE": "1456433741",
+								"PRIVATE":  "0",
+								"TAGS":     "multi",
+							},
+						},
+						{
+							Description: "Nested lists:\n- list1\n  - item1.1\n  - item1.2\n  - item1.3\n- list2\n  - item2.1",
+							Href:        "http://multi.li.ne/2",
+							Title:       "Multiline desc",
+							Attributes: map[string]string{
+								"ADD_DATE": "1456433742",
+								"PRIVATE":  "0",
+								"TAGS":     "multi",
+							},
+						},
+						{
+							Description: "List:\n- item1\n- item2\n\nParagraph number one.\n\nParagraph\nnumber\ntwo.",
+							Href:        "http://multi.li.ne/3",
+							Title:       "Multiline desc",
+							Attributes: map[string]string{
+								"ADD_DATE": "1456433747",
+								"PRIVATE":  "0",
+								"TAGS":     "multi",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			tname:         "Netscape (nested)",
+			inputFilename: "netscape_nested.htm",
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Bookmarks",
+					Bookmarks: []ast.Bookmark{
+						{
+							Href:  "http://nest.ed/1",
+							Title: "Nested 1",
+							Attributes: map[string]string{
+								"ADD_DATE": "1456433741",
+								"PRIVATE":  "0",
+								"TAGS":     "tag1,tag2, multi word",
+							},
+						},
+						{
+							Href:  "http://nest.ed/2",
+							Title: "Nested 2",
+							Attributes: map[string]string{
+								"ADD_DATE": "1456733741",
+								"PRIVATE":  "0",
+								"TAGS":     "tag4",
+							},
+						},
+					},
+					Subfolders: []ast.Folder{
+						{
+							Name: "Folder1, the first,folder to encounter",
+							Attributes: map[string]string{
+								"ADD_DATE":      "1456433722",
+								"LAST_MODIFIED": "1456433739",
+							},
+							Bookmarks: []ast.Bookmark{
+								{
+									Href:  "http://nest.ed/1-1",
+									Title: "Nested 1-1",
+									Attributes: map[string]string{
+										"ADD_DATE": "1456433742",
+										"PRIVATE":  "0",
+										"TAGS":     "tag1,tag2,multi word",
+									},
+								},
+								{
+									Href:  "http://nest.ed/1-2",
+									Title: "Nested 1-2",
+									Attributes: map[string]string{
+										"ADD_DATE": "1456433747",
+										"PRIVATE":  "0",
+										"TAGS":     "tag3,tag4, leaf multi word",
+									},
+								},
+							},
+						},
+						{
+							Name:        "Folder2",
+							Description: "This second folder contains wonderful links!",
+							Attributes: map[string]string{
+								"ADD_DATE": "1456433722",
+							},
+							Bookmarks: []ast.Bookmark{
+								{
+									Description: "First link of the second section",
+									Href:        "http://nest.ed/2-1",
+									Title:       "Nested 2-1",
+									Attributes: map[string]string{
+										"ADD_DATE": "1454433742",
+										"PRIVATE":  "0",
+									},
+								},
+								{
+									Description: "Second link of the second section",
+									Href:        "http://nest.ed/2-2",
+									Title:       "Nested 2-2",
+									Attributes: map[string]string{
+										"ADD_DATE": "1453233747",
+										"PRIVATE":  "0",
+									},
+								},
+							},
+						},
+						{
+							Name: "Folder3",
+							Subfolders: []ast.Folder{
+								{
+									Name: "Folder3-1",
+									Bookmarks: []ast.Bookmark{
+										{
+											Href:  "http://nest.ed/3-1",
+											Title: "Nested 3-1",
+											Attributes: map[string]string{
+												"ADD_DATE": "1454433742",
+												"PRIVATE":  "0",
+												"TAGS":     "tag3",
+											},
+										},
+										{
+											Href:  "http://nest.ed/3-2",
+											Title: "Nested 3-2",
+											Attributes: map[string]string{
+												"ADD_DATE": "1453233747",
+												"PRIVATE":  "0",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.tname, func(t *testing.T) {
+			got, err := ParseFile(filepath.Join("testdata", tc.inputFilename))
+
+			if err != nil {
+				t.Errorf("expected no error, got %q", err)
+				return
+			}
+
+			if got.Title != tc.want.Title {
+				t.Errorf("want title %q, got %q", tc.want.Title, got.Title)
+			}
+
+			assertFoldersEqual(t, got.Root, tc.want.Root)
+		})
+	}
+}
 func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 	t.Helper()
 
@@ -420,6 +658,12 @@ func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 
 		if len(got.Bookmarks[index].Attributes) != len(wantBookmark.Attributes) {
 			t.Errorf("want %d attributes for bookmark %d, got %d", len(wantBookmark.Attributes), index, len(got.Bookmarks[index].Attributes))
+		}
+
+		for name, wantValue := range wantBookmark.Attributes {
+			if got.Bookmarks[index].Attributes[name] != wantValue {
+				t.Errorf("want bookmark %d attribute %q value %q, got %q", index, name, wantValue, got.Bookmarks[index].Attributes[name])
+			}
 		}
 	}
 

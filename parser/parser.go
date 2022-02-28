@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/virtualtam/netscape-go/ast"
@@ -14,11 +15,23 @@ const (
 	NetscapeBookmarkDoctype string = "NETSCAPE-Bookmark-file-1"
 )
 
-// Parse reads a Netscape Bookmark document and processes token by token to
+// Parse reads a Netscape Bookmark document and processes it token by token to
 // build and return the corresponding AST.
 func Parse(readseeker io.ReadSeeker) (*ast.File, error) {
 	p := newParser(readseeker)
 	return p.parse()
+}
+
+// ParseFile reads a file containing a Netscape Bookmark document and processes
+// it token by token to build and return the corresponding AST.
+func ParseFile(filePath string) (*ast.File, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return &ast.File{}, err
+	}
+	defer file.Close()
+
+	return Parse(file)
 }
 
 type parser struct {
@@ -200,7 +213,11 @@ func (p *parser) parseBookmark(start *xml.StartElement) (ast.Bookmark, error) {
 func (p *parser) parseDescription() (string, error) {
 	startOffset := p.decoder.InputOffset()
 	endOffset := startOffset
-	retOffset := startOffset
+
+	readseekOffset, err := p.readseeker.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return "", err
+	}
 
 	// As the description may contain either text or HTML elements, we do not
 	// directly process the stream of XML tokens, and instead look for the start
@@ -217,12 +234,10 @@ loop:
 			endOffset = p.decoder.InputOffset()
 		case xml.StartElement:
 			if tokType.Name.Local == "DL" || tokType.Name.Local == "DT" {
-				retOffset = p.decoder.InputOffset()
 				break loop
 			}
 		case xml.EndElement:
 			if tokType.Name.Local == "DD" || tokType.Name.Local == "DL" {
-				retOffset = p.decoder.InputOffset()
 				break loop
 			}
 
@@ -230,18 +245,22 @@ loop:
 		}
 	}
 
+	readseekOffset, err = p.readseeker.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return "", err
+	}
 	// read raw data between start and end offsets
 	dataLen := int(endOffset - startOffset)
 
 	data := make([]byte, dataLen)
-	_, err := p.readseeker.Seek(startOffset, io.SeekStart)
+	_, err = p.readseeker.Seek(startOffset, io.SeekStart)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("description: failed to reset readseeker position to %d: %w", startOffset, err)
 	}
 
 	nRead, err := p.readseeker.Read(data)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("description: failed to read data in range [%d:%d]: %w", startOffset, endOffset, err)
 	}
 
 	if nRead != dataLen {
@@ -249,9 +268,9 @@ loop:
 	}
 
 	// reset the io.ReadSeeker position
-	_, err = p.readseeker.Seek(retOffset, io.SeekStart)
+	_, err = p.readseeker.Seek(readseekOffset, io.SeekStart)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("description: failed to reset readseeker position to %d: %w", startOffset, err)
 	}
 
 	// sanitize data
