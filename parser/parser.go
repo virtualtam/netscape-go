@@ -214,10 +214,7 @@ func (p *parser) parseDescription() (string, error) {
 	startOffset := p.decoder.InputOffset()
 	endOffset := startOffset
 
-	readseekOffset, err := p.readseeker.Seek(0, io.SeekCurrent)
-	if err != nil {
-		return "", err
-	}
+	var readseekOffset int64
 
 	// As the description may contain either text or HTML elements, we do not
 	// directly process the stream of XML tokens, and instead look for the start
@@ -245,7 +242,7 @@ loop:
 		}
 	}
 
-	readseekOffset, err = p.readseeker.Seek(0, io.SeekCurrent)
+	readseekOffset, err := p.readseeker.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return "", err
 	}
