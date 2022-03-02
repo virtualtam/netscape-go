@@ -19,7 +19,7 @@ Related projects
 - `aquilax/bookmarks <https://github.com/aquilax/bookmarks>`_ - Netscape
   Bookmark File Format Parser Library (Go)
 - `shaarli/netscape-bookmark-parser <https://github.com/shaarli/netscape-bookmark-parser>`_
-  PHP library to parse Netscape bookmark files (PHP)
+  - PHP library to parse Netscape bookmark files (PHP)
 - `FlyingWolFox/Netscape-Bookmarks-File-Parser
   <https://github.com/FlyingWolFox/Netscape-Bookmarks-File-Parser>`_ - Parser
   and creator for Netscape Bookmarks (Python)
