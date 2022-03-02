@@ -9,13 +9,6 @@ import (
 	"github.com/virtualtam/netscape-go/ast"
 )
 
-const (
-	createdAtAttr string = "ADD_DATE"
-	updatedAtAttr string = "LAST_MODIFIED"
-	privateAttr   string = "PRIVATE"
-	tagsAttr      string = "TAGS"
-)
-
 func decodeBookmark(b ast.Bookmark) (netscape.Bookmark, error) {
 	bookmark := netscape.Bookmark{
 		Title:       b.Title,

@@ -139,51 +139,46 @@ func TestDecodeBookmark(t *testing.T) {
 				t.Errorf("expected no error, got %q", err)
 			}
 
-			if got.CreatedAt != tc.want.CreatedAt {
-				t.Errorf("want creation date %q, got %q", tc.want.CreatedAt.String(), got.CreatedAt.String())
-			}
-
-			if got.UpdatedAt != tc.want.UpdatedAt {
-				t.Errorf("want update date %q, got %q", tc.want.UpdatedAt.String(), got.UpdatedAt.String())
-			}
-
-			if got.Title != tc.want.Title {
-				t.Errorf("want title %q, got %q", tc.want.Title, got.Title)
-			}
-
-			if got.URL != tc.want.URL {
-				t.Errorf("want URL %q, got %q", tc.want.URL.String(), got.URL.String())
-			}
-
-			if got.Description != tc.want.Description {
-				t.Errorf("want description %q, got %q", tc.want.Description, got.Description)
-			}
-
-			if got.Private != tc.want.Private {
-				t.Errorf("want private %t, got %t", tc.want.Private, got.Private)
-			}
-
-			if len(got.Tags) != len(tc.want.Tags) {
-				t.Errorf("want %d tags, got %d", len(tc.want.Tags), len(got.Tags))
-				return
-			}
-
-			for index, wantTag := range tc.want.Tags {
-				if got.Tags[index] != wantTag {
-					t.Errorf("want tag %d value %q, got %q", index, wantTag, got.Tags[index])
-				}
-			}
-
-			if len(got.Attributes) != len(tc.want.Attributes) {
-				t.Errorf("want %d attributes, got %d", len(tc.want.Attributes), len(got.Attributes))
-				return
-			}
-
-			for attr, wantValue := range tc.want.Attributes {
-				if got.Attributes[attr] != wantValue {
-					t.Errorf("want attribute %q value %q, got %q", attr, wantValue, got.Attributes[attr])
-				}
-			}
+			assertBookmarksEqual(t, got, tc.want)
 		})
 	}
+}
+
+func assertBookmarksEqual(t *testing.T, got netscape.Bookmark, want netscape.Bookmark) {
+	if got.CreatedAt != want.CreatedAt {
+		t.Errorf("want creation date %q, got %q", want.CreatedAt.String(), got.CreatedAt.String())
+	}
+
+	if got.UpdatedAt != want.UpdatedAt {
+		t.Errorf("want update date %q, got %q", want.UpdatedAt.String(), got.UpdatedAt.String())
+	}
+
+	if got.Title != want.Title {
+		t.Errorf("want title %q, got %q", want.Title, got.Title)
+	}
+
+	if got.URL != want.URL {
+		t.Errorf("want URL %q, got %q", want.URL.String(), got.URL.String())
+	}
+
+	if got.Description != want.Description {
+		t.Errorf("want description %q, got %q", want.Description, got.Description)
+	}
+
+	if got.Private != want.Private {
+		t.Errorf("want private %t, got %t", want.Private, got.Private)
+	}
+
+	if len(got.Tags) != len(want.Tags) {
+		t.Errorf("want %d tags, got %d", len(want.Tags), len(got.Tags))
+		return
+	}
+
+	for index, wantTag := range want.Tags {
+		if got.Tags[index] != wantTag {
+			t.Errorf("want tag %d value %q, got %q", index, wantTag, got.Tags[index])
+		}
+	}
+
+	assertAttributesEqual(t, got.Attributes, want.Attributes)
 }
