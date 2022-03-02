@@ -4,15 +4,15 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/virtualtam/netscape-go"
 	"github.com/virtualtam/netscape-go/ast"
+	"github.com/virtualtam/netscape-go/types"
 )
 
 func TestDecodeFile(t *testing.T) {
 	cases := []struct {
 		tname string
 		file  ast.File
-		want  netscape.Document
+		want  types.Document
 	}{
 		{
 			tname: "empty document",
@@ -37,12 +37,12 @@ func TestDecodeFile(t *testing.T) {
 					},
 				},
 			},
-			want: netscape.Document{
+			want: types.Document{
 				Title: "Bookmarks",
-				Root: netscape.Folder{
+				Root: types.Folder{
 					Name:        "Test Folder",
 					Description: "Add bookmarks to this folder",
-					Bookmarks: []netscape.Bookmark{
+					Bookmarks: []types.Bookmark{
 						{
 							URL: url.URL{
 								Scheme: "https",

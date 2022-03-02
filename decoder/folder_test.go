@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/virtualtam/netscape-go"
 	"github.com/virtualtam/netscape-go/ast"
+	"github.com/virtualtam/netscape-go/types"
 )
 
 func TestDecodeFolder(t *testing.T) {
 	cases := []struct {
 		tname string
 		input ast.Folder
-		want  netscape.Folder
+		want  types.Folder
 	}{
 		{
 			tname: "empty folder",
@@ -21,7 +21,7 @@ func TestDecodeFolder(t *testing.T) {
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 			},
-			want: netscape.Folder{
+			want: types.Folder{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 			},
@@ -37,7 +37,7 @@ func TestDecodeFolder(t *testing.T) {
 					"PERSONAL_TOOLBAR_FOLDER": "true",
 				},
 			},
-			want: netscape.Folder{
+			want: types.Folder{
 				CreatedAt:   time.Date(2022, time.March, 1, 17, 11, 13, 0, time.UTC),
 				UpdatedAt:   time.Date(2022, time.March, 1, 22, 9, 46, 0, time.UTC),
 				Name:        "Test Folder",
@@ -64,10 +64,10 @@ func TestDecodeFolder(t *testing.T) {
 					},
 				},
 			},
-			want: netscape.Folder{
+			want: types.Folder{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
-				Bookmarks: []netscape.Bookmark{
+				Bookmarks: []types.Bookmark{
 					{
 						URL: url.URL{
 							Scheme: "https",
@@ -122,10 +122,10 @@ func TestDecodeFolder(t *testing.T) {
 					},
 				},
 			},
-			want: netscape.Folder{
+			want: types.Folder{
 				Name:        "Bookmarks",
 				Description: "Root Folder",
-				Bookmarks: []netscape.Bookmark{
+				Bookmarks: []types.Bookmark{
 					{
 						URL: url.URL{
 							Scheme: "https",
@@ -142,13 +142,13 @@ func TestDecodeFolder(t *testing.T) {
 						Title: "Test Domain II",
 					},
 				},
-				Subfolders: []netscape.Folder{
+				Subfolders: []types.Folder{
 					{
 						Name: "Empty",
 					},
 					{
 						Name: "Personal Toolbar",
-						Bookmarks: []netscape.Bookmark{
+						Bookmarks: []types.Bookmark{
 							{
 								URL: url.URL{
 									Scheme: "https",
@@ -185,7 +185,7 @@ func TestDecodeFolder(t *testing.T) {
 	}
 }
 
-func assertFoldersEqual(t *testing.T, got netscape.Folder, want netscape.Folder) {
+func assertFoldersEqual(t *testing.T, got types.Folder, want types.Folder) {
 	t.Helper()
 
 	if got.CreatedAt != want.CreatedAt {

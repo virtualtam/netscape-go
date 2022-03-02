@@ -1,4 +1,4 @@
-package netscape
+package types
 
 import "time"
 

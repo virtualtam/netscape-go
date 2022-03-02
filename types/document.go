@@ -1,4 +1,4 @@
-package netscape
+package types
 
 // A Document represents a collection of Netscape Bookmarks.
 type Document struct {

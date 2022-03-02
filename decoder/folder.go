@@ -1,12 +1,12 @@
 package decoder
 
 import (
-	"github.com/virtualtam/netscape-go"
 	"github.com/virtualtam/netscape-go/ast"
+	"github.com/virtualtam/netscape-go/types"
 )
 
-func decodeFolder(f ast.Folder) (netscape.Folder, error) {
-	folder := netscape.Folder{
+func decodeFolder(f ast.Folder) (types.Folder, error) {
+	folder := types.Folder{
 		Name:        f.Name,
 		Description: f.Description,
 		Attributes:  map[string]string{},
@@ -17,13 +17,13 @@ func decodeFolder(f ast.Folder) (netscape.Folder, error) {
 		case createdAtAttr:
 			createdAt, err := decodeDate(value)
 			if err != nil {
-				return netscape.Folder{}, err
+				return types.Folder{}, err
 			}
 			folder.CreatedAt = createdAt
 		case updatedAtAttr:
 			updatedAt, err := decodeDate(value)
 			if err != nil {
-				return netscape.Folder{}, err
+				return types.Folder{}, err
 			}
 			folder.UpdatedAt = updatedAt
 		default:
@@ -34,7 +34,7 @@ func decodeFolder(f ast.Folder) (netscape.Folder, error) {
 	for _, b := range f.Bookmarks {
 		bookmark, err := decodeBookmark(b)
 		if err != nil {
-			return netscape.Folder{}, err
+			return types.Folder{}, err
 		}
 
 		folder.Bookmarks = append(folder.Bookmarks, bookmark)
@@ -43,7 +43,7 @@ func decodeFolder(f ast.Folder) (netscape.Folder, error) {
 	for _, sf := range f.Subfolders {
 		subfolder, err := decodeFolder(sf)
 		if err != nil {
-			return netscape.Folder{}, err
+			return types.Folder{}, err
 		}
 
 		folder.Subfolders = append(folder.Subfolders, subfolder)

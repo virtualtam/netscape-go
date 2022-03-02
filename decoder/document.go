@@ -1,18 +1,18 @@
 package decoder
 
 import (
-	"github.com/virtualtam/netscape-go"
 	"github.com/virtualtam/netscape-go/ast"
+	"github.com/virtualtam/netscape-go/types"
 )
 
-func decodeFile(f ast.File) (netscape.Document, error) {
-	document := netscape.Document{
+func decodeFile(f ast.File) (types.Document, error) {
+	document := types.Document{
 		Title: f.Title,
 	}
 
 	root, err := decodeFolder(f.Root)
 	if err != nil {
-		return netscape.Document{}, err
+		return types.Document{}, err
 	}
 	document.Root = root
 

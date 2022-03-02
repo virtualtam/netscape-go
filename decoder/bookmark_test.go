@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/virtualtam/netscape-go"
 	"github.com/virtualtam/netscape-go/ast"
+	"github.com/virtualtam/netscape-go/types"
 )
 
 func TestDecodeBookmark(t *testing.T) {
 	cases := []struct {
 		tname string
 		input ast.Bookmark
-		want  netscape.Bookmark
+		want  types.Bookmark
 	}{
 		{
 			tname: "bookmark with mandatory information only",
@@ -21,7 +21,7 @@ func TestDecodeBookmark(t *testing.T) {
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 			},
-			want: netscape.Bookmark{
+			want: types.Bookmark{
 				Title: "Test Domain",
 				URL: url.URL{
 					Scheme: "https",
@@ -36,7 +36,7 @@ func TestDecodeBookmark(t *testing.T) {
 				Href:        "https://domain.tld",
 				Title:       "Test Domain",
 			},
-			want: netscape.Bookmark{
+			want: types.Bookmark{
 				Title: "Test Domain",
 				URL: url.URL{
 					Scheme: "https",
@@ -55,7 +55,7 @@ func TestDecodeBookmark(t *testing.T) {
 					"LAST_MODIFIED": "1646172586",
 				},
 			},
-			want: netscape.Bookmark{
+			want: types.Bookmark{
 				CreatedAt: time.Date(2022, time.March, 1, 17, 11, 13, 0, time.UTC),
 				UpdatedAt: time.Date(2022, time.March, 1, 22, 9, 46, 0, time.UTC),
 				Title:     "Test Domain",
@@ -74,7 +74,7 @@ func TestDecodeBookmark(t *testing.T) {
 					"PRIVATE": "1",
 				},
 			},
-			want: netscape.Bookmark{
+			want: types.Bookmark{
 				Title: "Test Domain",
 				URL: url.URL{
 					Scheme: "https",
@@ -92,7 +92,7 @@ func TestDecodeBookmark(t *testing.T) {
 					"TAGS": "test, netscape,     bookmark",
 				},
 			},
-			want: netscape.Bookmark{
+			want: types.Bookmark{
 				Title: "Test Domain",
 				URL: url.URL{
 					Scheme: "https",
@@ -116,7 +116,7 @@ func TestDecodeBookmark(t *testing.T) {
 					"PRIVATE":      "1",
 				},
 			},
-			want: netscape.Bookmark{
+			want: types.Bookmark{
 				Title: "Test Domain",
 				URL: url.URL{
 					Scheme: "https",
@@ -144,7 +144,7 @@ func TestDecodeBookmark(t *testing.T) {
 	}
 }
 
-func assertBookmarksEqual(t *testing.T, got netscape.Bookmark, want netscape.Bookmark) {
+func assertBookmarksEqual(t *testing.T, got types.Bookmark, want types.Bookmark) {
 	if got.CreatedAt != want.CreatedAt {
 		t.Errorf("want creation date %q, got %q", want.CreatedAt.String(), got.CreatedAt.String())
 	}

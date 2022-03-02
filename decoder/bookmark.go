@@ -5,12 +5,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/virtualtam/netscape-go"
 	"github.com/virtualtam/netscape-go/ast"
+	"github.com/virtualtam/netscape-go/types"
 )
 
-func decodeBookmark(b ast.Bookmark) (netscape.Bookmark, error) {
-	bookmark := netscape.Bookmark{
+func decodeBookmark(b ast.Bookmark) (types.Bookmark, error) {
+	bookmark := types.Bookmark{
 		Title:       b.Title,
 		Description: b.Description,
 		Attributes:  map[string]string{},
@@ -18,7 +18,7 @@ func decodeBookmark(b ast.Bookmark) (netscape.Bookmark, error) {
 
 	url, err := url.Parse(b.Href)
 	if err != nil {
-		return netscape.Bookmark{}, err
+		return types.Bookmark{}, err
 	}
 	bookmark.URL = *url
 
@@ -27,13 +27,13 @@ func decodeBookmark(b ast.Bookmark) (netscape.Bookmark, error) {
 		case createdAtAttr:
 			createdAt, err := decodeDate(value)
 			if err != nil {
-				return netscape.Bookmark{}, err
+				return types.Bookmark{}, err
 			}
 			bookmark.CreatedAt = createdAt
 		case updatedAtAttr:
 			updatedAt, err := decodeDate(value)
 			if err != nil {
-				return netscape.Bookmark{}, err
+				return types.Bookmark{}, err
 			}
 			bookmark.UpdatedAt = updatedAt
 		case privateAttr:
