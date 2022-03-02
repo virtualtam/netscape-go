@@ -1,4 +1,6 @@
-all: lint cover
+BUILD_DIR ?= build
+
+all: lint cover build
 .PHONY: all
 
 lint:
@@ -16,3 +18,8 @@ cover:
 coverhtml: cover
 	go tool cover -html=coverage.out
 .PHONY: coverhtml
+
+build: $(BUILD_DIR)/unmarshal
+
+$(BUILD_DIR)/%: $(shell find . -type f -name "*.go")
+	go build -trimpath -o $@ ./cmd/$*
