@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/virtualtam/netscape-go/ast"
@@ -20,18 +19,6 @@ const (
 func Parse(readseeker io.ReadSeeker) (*ast.File, error) {
 	p := newParser(readseeker)
 	return p.parse()
-}
-
-// ParseFile reads a file containing a Netscape Bookmark document and processes
-// it token by token to build and return the corresponding AST.
-func ParseFile(filePath string) (*ast.File, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return &ast.File{}, err
-	}
-	defer file.Close()
-
-	return Parse(file)
 }
 
 type parser struct {

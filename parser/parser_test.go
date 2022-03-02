@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -366,8 +367,7 @@ func TestParse(t *testing.T) {
 			}
 
 			if err != nil {
-				t.Errorf("expected no error, got %q", err)
-				return
+				t.Fatalf("expected no error, got %q", err)
 			}
 
 			if got.Title != tc.want.Title {
@@ -601,11 +601,16 @@ func TestParseFile(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.tname, func(t *testing.T) {
-			got, err := ParseFile(filepath.Join("testdata", tc.inputFilename))
+			file, err := os.Open(filepath.Join("testdata", tc.inputFilename))
+			if err != nil {
+				t.Fatalf("failed to open input file %s: %s", tc.inputFilename, err)
+			}
+			defer file.Close()
+
+			got, err := Parse(file)
 
 			if err != nil {
-				t.Errorf("expected no error, got %q", err)
-				return
+				t.Fatalf("expected no error, got %q", err)
 			}
 
 			if got.Title != tc.want.Title {
@@ -628,8 +633,7 @@ func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 	}
 
 	if len(got.Attributes) != len(want.Attributes) {
-		t.Errorf("want %d attributes for folder %q, got %d", len(want.Attributes), want.Name, len(got.Attributes))
-		return
+		t.Fatalf("want %d attributes for folder %q, got %d", len(want.Attributes), want.Name, len(got.Attributes))
 	}
 
 	for name, wantValue := range want.Attributes {
@@ -639,8 +643,7 @@ func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 	}
 
 	if len(got.Bookmarks) != len(want.Bookmarks) {
-		t.Errorf("want %d bookmarks in folder %q, got %d", len(want.Bookmarks), want.Name, len(got.Bookmarks))
-		return
+		t.Fatalf("want %d bookmarks in folder %q, got %d", len(want.Bookmarks), want.Name, len(got.Bookmarks))
 	}
 
 	for index, wantBookmark := range want.Bookmarks {
@@ -668,8 +671,7 @@ func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
 	}
 
 	if len(got.Subfolders) != len(want.Subfolders) {
-		t.Errorf("want %d subfolders for folder %q, got %d", len(want.Subfolders), want.Name, len(got.Subfolders))
-		return
+		t.Fatalf("want %d subfolders for folder %q, got %d", len(want.Subfolders), want.Name, len(got.Subfolders))
 	}
 
 	for index, wantSubfolder := range want.Subfolders {

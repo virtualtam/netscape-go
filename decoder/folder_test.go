@@ -176,8 +176,7 @@ func TestDecodeFolder(t *testing.T) {
 			got, err := decodeFolder(tc.input)
 
 			if err != nil {
-				t.Errorf("expected no error, got %q", err)
-				return
+				t.Fatalf("expected no error, got %q", err)
 			}
 
 			assertFoldersEqual(t, got, tc.want)
@@ -207,8 +206,7 @@ func assertFoldersEqual(t *testing.T, got types.Folder, want types.Folder) {
 	assertAttributesEqual(t, got.Attributes, want.Attributes)
 
 	if len(got.Bookmarks) != len(want.Bookmarks) {
-		t.Errorf("want %d bookmarks, got %d", len(want.Bookmarks), len(got.Bookmarks))
-		return
+		t.Fatalf("want %d bookmarks, got %d", len(want.Bookmarks), len(got.Bookmarks))
 	}
 
 	for index, wantBookmark := range want.Bookmarks {
@@ -216,8 +214,7 @@ func assertFoldersEqual(t *testing.T, got types.Folder, want types.Folder) {
 	}
 
 	if len(got.Subfolders) != len(want.Subfolders) {
-		t.Errorf("want %d subfolders, got %d", len(want.Subfolders), len(got.Subfolders))
-		return
+		t.Fatalf("want %d subfolders, got %d", len(want.Subfolders), len(got.Subfolders))
 	}
 
 	for index, wantSubfolder := range want.Subfolders {

@@ -170,8 +170,7 @@ func assertBookmarksEqual(t *testing.T, got types.Bookmark, want types.Bookmark)
 	}
 
 	if len(got.Tags) != len(want.Tags) {
-		t.Errorf("want %d tags, got %d", len(want.Tags), len(got.Tags))
-		return
+		t.Fatalf("want %d tags, got %d", len(want.Tags), len(got.Tags))
 	}
 
 	for index, wantTag := range want.Tags {

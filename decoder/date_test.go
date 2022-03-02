@@ -63,8 +63,7 @@ func TestDecodeDateTime(t *testing.T) {
 			got, err := decodeDate(tc.input)
 
 			if err != nil {
-				t.Errorf("expected no error, got %q", err)
-				return
+				t.Fatalf("expected no error, got %q", err)
 			}
 
 			if got != tc.want {

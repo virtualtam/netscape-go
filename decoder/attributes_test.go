@@ -6,8 +6,7 @@ func assertAttributesEqual(t *testing.T, got map[string]string, want map[string]
 	t.Helper()
 
 	if len(got) != len(want) {
-		t.Errorf("want %d attributes, got %d", len(want), len(got))
-		return
+		t.Fatalf("want %d attributes, got %d", len(want), len(got))
 	}
 
 	for attr, wantValue := range want {
