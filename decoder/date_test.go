@@ -50,6 +50,12 @@ func TestDecodeDateTime(t *testing.T) {
 			input: "2022-03-01T18:54:30.585063231+01:00",
 			want:  time.Date(2022, time.March, 1, 17, 54, 30, 585063231, time.UTC),
 		},
+		{
+			// date "+%d/%b/%Y:%H:%M:%S %z"
+			tname: "Common Log",
+			input: "10/Oct/2000:13:55:36 -0700",
+			want:  time.Date(2000, 10, 10, 20, 55, 36, 0, time.UTC),
+		},
 	}
 
 	for _, tc := range cases {

@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const (
+	commonLogLayout string = "02/Jan/2006:15:04:05 -0700"
+)
+
 func decodeDate(input string) (time.Time, error) {
 	// First, attempt to parse the date as a UNIX epoch, which is the most
 	// commonly used format.
@@ -17,6 +21,23 @@ func decodeDate(input string) (time.Time, error) {
 	date, err := decodeRFC3339Date(input)
 	if err == nil {
 		return date, nil
+	}
+
+	// Attempt to parse the date as Comon Log
+	date, err = decodeCommonLogDate(input)
+	if err == nil {
+		return date, nil
+	}
+
+	return time.Time{}, err
+}
+
+// decodeCommonLogDate returns the time.Time corresponding to a date formatted
+// in the Common Log format.
+func decodeCommonLogDate(input string) (time.Time, error) {
+	date, err := time.Parse(commonLogLayout, input)
+	if err == nil {
+		return date.UTC(), nil
 	}
 
 	return time.Time{}, err
