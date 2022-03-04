@@ -58,6 +58,21 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			tname: "empty document with UTF-8 BOM",
+			input: string(utf8bom) + `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+</DL><p>
+`,
+			want: ast.File{
+				Title: "Bookmarks",
+				Root: ast.Folder{
+					Name: "Bookmarks",
+				},
+			},
+		},
+		{
 			tname: "bookmark with attributes",
 			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <TITLE>Bookmarks</TITLE>

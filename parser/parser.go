@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -12,6 +13,11 @@ import (
 
 const (
 	NetscapeBookmarkDoctype string = "NETSCAPE-Bookmark-file-1"
+)
+
+var (
+	// Byte order mark
+	utf8bom = []byte{0xef, 0xbb, 0xbf}
 )
 
 // Parse reads a Netscape Bookmark document and processes it token by token to
@@ -263,20 +269,28 @@ loop:
 }
 
 func (p *parser) verifyDoctype() error {
-	tok, err := p.decoder.Token()
+	for {
+		tok, err := p.decoder.Token()
 
-	if tok == nil || errors.Is(err, io.EOF) {
-		return ErrDoctypeMissing
-	}
-
-	switch tokType := tok.(type) {
-	case xml.Directive:
-		if string(tokType) != fmt.Sprintf("DOCTYPE %s", NetscapeBookmarkDoctype) {
-			return ErrDoctypeInvalid
+		if tok == nil || errors.Is(err, io.EOF) {
+			return ErrDoctypeMissing
 		}
-	default:
-		return ErrDoctypeMissing
-	}
 
-	return nil
+		switch tokType := tok.(type) {
+		case xml.CharData:
+			if bytes.Equal(tokType, utf8bom) {
+				continue
+			}
+			return ErrTokenUnexpected
+
+		case xml.Directive:
+			if string(tokType) != fmt.Sprintf("DOCTYPE %s", NetscapeBookmarkDoctype) {
+				return ErrDoctypeInvalid
+			}
+			return nil
+
+		default:
+			return ErrDoctypeMissing
+		}
+	}
 }
