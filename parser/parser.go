@@ -60,7 +60,7 @@ func (p *parser) parse() (*ast.File, error) {
 		switch tokType := tok.(type) {
 		case xml.StartElement:
 			switch tokType.Name.Local {
-			case "TITLE":
+			case "TITLE", "Title":
 				if err := p.parseTitle(&tokType); err != nil {
 					return &ast.File{}, err
 				}
@@ -72,7 +72,7 @@ func (p *parser) parse() (*ast.File, error) {
 
 				p.file.Root = folder
 				p.currentFolder = &p.file.Root
-			case "DL":
+			case "DL", "DT":
 				if err := p.parseBookmarks(&tokType); err != nil {
 					return &ast.File{}, err
 				}

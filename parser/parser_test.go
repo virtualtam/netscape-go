@@ -612,6 +612,69 @@ func TestParseFile(t *testing.T) {
 				},
 			},
 		},
+		{
+			tname:         "Safari (folded)",
+			inputFilename: "safari_folded.htm",
+			want: ast.File{
+				Title: "Signets",
+				Root: ast.Folder{
+					Name:      "Signets",
+					Bookmarks: []ast.Bookmark{},
+					Subfolders: []ast.Folder{
+						{
+							Name: "Favoris",
+							Attributes: map[string]string{
+								"FOLDED": "FOLDED",
+							},
+							Bookmarks: []ast.Bookmark{
+								{
+									Href:  "https://github.com/",
+									Title: "GitHub",
+								},
+							},
+						},
+						{
+							Name: "Menu Signets",
+							Attributes: map[string]string{
+								"FOLDED": "FOLDED",
+							},
+						},
+						{
+							Name: "GitHub - Go",
+							Attributes: map[string]string{
+								"FOLDED": "FOLDED",
+							},
+							Bookmarks: []ast.Bookmark{
+								{
+									Href:  "https://github.com/golang/go",
+									Title: "golang/go: The Go programming language",
+								},
+							},
+						},
+						{
+							Name: "Misc",
+							Attributes: map[string]string{
+								"FOLDED": "FOLDED",
+							},
+							Subfolders: []ast.Folder{
+								{
+									Name: "Wiki",
+									Attributes: map[string]string{
+										"FOLDED": "FOLDED",
+									},
+									Bookmarks: []ast.Bookmark{
+										{
+											Href:  "https://en.wikipedia.org/wiki/Main_Page",
+											Title: "Wikipedia, the free encyclopedia",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range cases {
