@@ -28,8 +28,10 @@ func Parse(readseeker io.ReadSeeker) (*ast.File, error) {
 }
 
 type parser struct {
-	readseeker      io.ReadSeeker
-	decoder         *xml.Decoder
+	readseeker  io.ReadSeeker
+	decoder     *xml.Decoder
+	tokenOffset int64
+
 	file            *ast.File
 	currentFolder   *ast.Folder
 	currentBookmark *ast.Bookmark
@@ -89,9 +91,10 @@ func (p *parser) parseTitle(start *xml.StartElement) error {
 	}
 
 	if err := p.decoder.DecodeElement(&title, start); err != nil {
-		return ErrTokenUnexpected
+		return wrapWithError("failed to parse title", p.tokenOffset, err)
 	}
 
+	p.tokenOffset = p.decoder.InputOffset()
 	p.file.Title = title.Value
 
 	return nil
@@ -103,8 +106,10 @@ func (p *parser) parseFolder(start *xml.StartElement) (ast.Folder, error) {
 	}
 
 	if err := p.decoder.DecodeElement(&elt, start); err != nil {
-		return ast.Folder{}, ErrTokenUnexpected
+		return ast.Folder{}, wrapWithError("failed to parse folder", p.tokenOffset, err)
 	}
+
+	p.tokenOffset = p.decoder.InputOffset()
 
 	folder := ast.Folder{
 		Name:       elt.Name,
@@ -177,8 +182,10 @@ func (p *parser) parseBookmark(start *xml.StartElement) (ast.Bookmark, error) {
 	}
 
 	if err := p.decoder.DecodeElement(&link, start); err != nil {
-		return ast.Bookmark{}, ErrTokenUnexpected
+		return ast.Bookmark{}, wrapWithError("failed to parse bookmark", p.tokenOffset, err)
 	}
+
+	p.tokenOffset = p.decoder.InputOffset()
 
 	bookmark := ast.Bookmark{
 		Title:      link.Title,
@@ -215,9 +222,11 @@ func (p *parser) parseDescription() (string, error) {
 loop:
 	for {
 		tok, err := p.decoder.Token()
-		if tok == nil || errors.Is(err, io.EOF) {
-			return "", ErrEOFUnexpected
+		if err != nil {
+			return "", wrapWithError("failed to parse description", p.tokenOffset, err)
 		}
+
+		p.tokenOffset = p.decoder.InputOffset()
 
 		switch tokType := tok.(type) {
 		case xml.CharData:
@@ -276,16 +285,18 @@ func (p *parser) verifyDoctype() error {
 			return ErrDoctypeMissing
 		}
 
+		p.tokenOffset = p.decoder.InputOffset()
+
 		switch tokType := tok.(type) {
 		case xml.CharData:
 			if bytes.Equal(tokType, utf8bom) {
 				continue
 			}
-			return ErrTokenUnexpected
+			return wrapWithError("unexpected character data", p.tokenOffset, ErrDoctypeInvalid)
 
 		case xml.Directive:
 			if string(tokType) != fmt.Sprintf("DOCTYPE %s", NetscapeBookmarkDoctype) {
-				return ErrDoctypeInvalid
+				return wrapWithError(fmt.Sprintf("unknown DOCTYPE %s", string(tokType)), p.tokenOffset, ErrDoctypeInvalid)
 			}
 			return nil
 
