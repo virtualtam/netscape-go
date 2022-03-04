@@ -7,15 +7,15 @@ import (
 
 // A Bookmark represents a Netscape Bookmark.
 type Bookmark struct {
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 
-	Title string
-	URL   url.URL
+	Title string  `json:"title"`
+	URL   url.URL `json:"-"`
 
-	Description string
-	Private     bool
-	Tags        []string
+	Description string   `json:"description,omitempty"`
+	Private     bool     `json:"private"`
+	Tags        []string `json:"tags,omitempty"`
 
-	Attributes map[string]string
+	Attributes map[string]string `json:"attributes,omitempty"`
 }
