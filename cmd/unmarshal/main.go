@@ -22,7 +22,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	jsonData, err := json.MarshalIndent(document, "", " ")
+	jsonData, err := json.MarshalIndent(document, "", "  ")
 	if err != nil {
 		fmt.Println("failed to marshal data as JSON:", err)
 		os.Exit(1)

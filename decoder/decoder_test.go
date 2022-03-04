@@ -1,7 +1,6 @@
 package decoder
 
 import (
-	"net/url"
 	"testing"
 	"time"
 
@@ -45,19 +44,13 @@ func TestDecodeFile(t *testing.T) {
 					Description: "Add bookmarks to this folder",
 					Bookmarks: []types.Bookmark{
 						{
-							URL: url.URL{
-								Scheme: "https",
-								Host:   "domain.tld",
-							},
+							Href:  "https://domain.tld",
 							Title: "Test Domain",
 						},
 						{
 							Description: "Second test",
-							URL: url.URL{
-								Scheme: "https",
-								Host:   "test.domain.tld",
-							},
-							Title: "Test Domain II",
+							Href:        "https://test.domain.tld",
+							Title:       "Test Domain II",
 						},
 					},
 				},
@@ -159,19 +152,13 @@ func TestDecodeFolder(t *testing.T) {
 				Description: "Add bookmarks to this folder",
 				Bookmarks: []types.Bookmark{
 					{
-						URL: url.URL{
-							Scheme: "https",
-							Host:   "domain.tld",
-						},
+						Href:  "https://domain.tld",
 						Title: "Test Domain",
 					},
 					{
 						Description: "Second test",
-						URL: url.URL{
-							Scheme: "https",
-							Host:   "test.domain.tld",
-						},
-						Title: "Test Domain II",
+						Href:        "https://test.domain.tld",
+						Title:       "Test Domain II",
 					},
 				},
 			},
@@ -217,19 +204,13 @@ func TestDecodeFolder(t *testing.T) {
 				Description: "Root Folder",
 				Bookmarks: []types.Bookmark{
 					{
-						URL: url.URL{
-							Scheme: "https",
-							Host:   "domain.tld",
-						},
+						Href:  "https://domain.tld",
 						Title: "Test Domain",
 					},
 					{
 						Description: "Second test",
-						URL: url.URL{
-							Scheme: "https",
-							Host:   "test.domain.tld",
-						},
-						Title: "Test Domain II",
+						Href:        "https://test.domain.tld",
+						Title:       "Test Domain II",
 					},
 				},
 				Subfolders: []types.Folder{
@@ -240,19 +221,13 @@ func TestDecodeFolder(t *testing.T) {
 						Name: "Personal Toolbar",
 						Bookmarks: []types.Bookmark{
 							{
-								URL: url.URL{
-									Scheme: "https",
-									Host:   "personal.tld",
-								},
+								Href:  "https://personal.tld",
 								Title: "Personal Domain",
 							},
 							{
 								Description: "Weather Reports",
-								URL: url.URL{
-									Scheme: "https",
-									Host:   "weather.tld",
-								},
-								Title: "Weather Reports",
+								Href:        "https://weather.tld",
+								Title:       "Weather Reports",
 							},
 						},
 					},
@@ -325,10 +300,7 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 			want: types.Bookmark{
 				Title: "Test Domain",
-				URL: url.URL{
-					Scheme: "https",
-					Host:   "domain.tld",
-				},
+				Href:  "https://domain.tld",
 			},
 		},
 		{
@@ -339,11 +311,8 @@ func TestDecodeBookmark(t *testing.T) {
 				Title:       "Test Domain",
 			},
 			want: types.Bookmark{
-				Title: "Test Domain",
-				URL: url.URL{
-					Scheme: "https",
-					Host:   "domain.tld",
-				},
+				Title:       "Test Domain",
+				Href:        "https://domain.tld",
 				Description: "Nested lists:\n- list1\n  - item1.1\n  - item1.2\n  - item1.3\n- list2\n  - item2.1",
 			},
 		},
@@ -361,10 +330,7 @@ func TestDecodeBookmark(t *testing.T) {
 				CreatedAt: &bookmarkCreatedAt,
 				UpdatedAt: &bookmarkUpdatedAt,
 				Title:     "Test Domain",
-				URL: url.URL{
-					Scheme: "https",
-					Host:   "domain.tld",
-				},
+				Href:      "https://domain.tld",
 			},
 		},
 		{
@@ -377,11 +343,8 @@ func TestDecodeBookmark(t *testing.T) {
 				},
 			},
 			want: types.Bookmark{
-				Title: "Test Domain",
-				URL: url.URL{
-					Scheme: "https",
-					Host:   "domain.tld",
-				},
+				Title:   "Test Domain",
+				Href:    "https://domain.tld",
 				Private: true,
 			},
 		},
@@ -396,10 +359,7 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 			want: types.Bookmark{
 				Title: "Test Domain",
-				URL: url.URL{
-					Scheme: "https",
-					Host:   "domain.tld",
-				},
+				Href:  "https://domain.tld",
 				Tags: []string{
 					"bookmark",
 					"netscape",
@@ -419,11 +379,8 @@ func TestDecodeBookmark(t *testing.T) {
 				},
 			},
 			want: types.Bookmark{
-				Title: "Test Domain",
-				URL: url.URL{
-					Scheme: "https",
-					Host:   "domain.tld",
-				},
+				Title:   "Test Domain",
+				Href:    "https://domain.tld",
 				Private: true,
 				Attributes: map[string]string{
 					"ICON_URI":     "https://domain.tld/favicon.ico",
@@ -455,8 +412,8 @@ func assertBookmarksEqual(t *testing.T, got types.Bookmark, want types.Bookmark)
 		t.Errorf("want title %q, got %q", want.Title, got.Title)
 	}
 
-	if got.URL != want.URL {
-		t.Errorf("want URL %q, got %q", want.URL.String(), got.URL.String())
+	if got.Href != want.Href {
+		t.Errorf("want URL string %q, got %q", want.Href, got.Href)
 	}
 
 	if got.Description != want.Description {

@@ -1,7 +1,6 @@
 package decoder
 
 import (
-	"net/url"
 	"sort"
 	"strings"
 	"time"
@@ -92,16 +91,11 @@ func (d *Decoder) decodeFolder(f ast.Folder) (types.Folder, error) {
 
 func (d Decoder) decodeBookmark(b ast.Bookmark) (types.Bookmark, error) {
 	bookmark := types.Bookmark{
-		Title:       b.Title,
 		Description: b.Description,
+		Href:        b.Href,
+		Title:       b.Title,
 		Attributes:  map[string]string{},
 	}
-
-	url, err := url.Parse(b.Href)
-	if err != nil {
-		return types.Bookmark{}, err
-	}
-	bookmark.URL = *url
 
 	for attr, value := range b.Attributes {
 		switch attr {
