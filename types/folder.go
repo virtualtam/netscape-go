@@ -4,8 +4,8 @@ import "time"
 
 // A Folder represents a folder containing Netscape Bookmarks and child Folders.
 type Folder struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 
 	Description string
 	Name        string

@@ -84,6 +84,9 @@ func TestDecodeFile(t *testing.T) {
 }
 
 func TestDecodeFolder(t *testing.T) {
+	folderCreatedAt := time.Date(2022, time.March, 1, 17, 11, 13, 0, time.UTC)
+	folderUpdatedAt := time.Date(2022, time.March, 1, 22, 9, 46, 0, time.UTC)
+
 	cases := []struct {
 		tname string
 		input ast.Folder
@@ -101,6 +104,19 @@ func TestDecodeFolder(t *testing.T) {
 			},
 		},
 		{
+			tname: "empty folder with creation date",
+			input: ast.Folder{
+				Name: "Test Folder",
+				Attributes: map[string]string{
+					"ADD_DATE": "1646154673",
+				},
+			},
+			want: types.Folder{
+				CreatedAt: &folderCreatedAt,
+				Name:      "Test Folder",
+			},
+		},
+		{
 			tname: "empty folder with creation and update dates, and extra attributes",
 			input: ast.Folder{
 				Name:        "Test Folder",
@@ -112,8 +128,8 @@ func TestDecodeFolder(t *testing.T) {
 				},
 			},
 			want: types.Folder{
-				CreatedAt:   time.Date(2022, time.March, 1, 17, 11, 13, 0, time.UTC),
-				UpdatedAt:   time.Date(2022, time.March, 1, 22, 9, 46, 0, time.UTC),
+				CreatedAt:   &folderCreatedAt,
+				UpdatedAt:   &folderUpdatedAt,
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 				Attributes: map[string]string{
@@ -262,13 +278,8 @@ func TestDecodeFolder(t *testing.T) {
 func assertFoldersEqual(t *testing.T, got types.Folder, want types.Folder) {
 	t.Helper()
 
-	if got.CreatedAt != want.CreatedAt {
-		t.Errorf("want creation date %q, got %q", want.CreatedAt.String(), got.CreatedAt.String())
-	}
-
-	if got.UpdatedAt != want.UpdatedAt {
-		t.Errorf("want update date %q, got %q", want.UpdatedAt.String(), got.UpdatedAt.String())
-	}
+	assertDatesEqual(t, "creation", got.CreatedAt, want.CreatedAt)
+	assertDatesEqual(t, "update", got.UpdatedAt, want.UpdatedAt)
 
 	if got.Description != want.Description {
 		t.Errorf("want description %q, got %q", want.Description, got.Description)
@@ -296,7 +307,11 @@ func assertFoldersEqual(t *testing.T, got types.Folder, want types.Folder) {
 		assertFoldersEqual(t, got.Subfolders[index], wantSubfolder)
 	}
 }
+
 func TestDecodeBookmark(t *testing.T) {
+	bookmarkCreatedAt := time.Date(2022, time.March, 1, 17, 11, 13, 0, time.UTC)
+	bookmarkUpdatedAt := time.Date(2022, time.March, 1, 22, 9, 46, 0, time.UTC)
+
 	cases := []struct {
 		tname string
 		input ast.Bookmark
@@ -343,8 +358,8 @@ func TestDecodeBookmark(t *testing.T) {
 				},
 			},
 			want: types.Bookmark{
-				CreatedAt: time.Date(2022, time.March, 1, 17, 11, 13, 0, time.UTC),
-				UpdatedAt: time.Date(2022, time.March, 1, 22, 9, 46, 0, time.UTC),
+				CreatedAt: &bookmarkCreatedAt,
+				UpdatedAt: &bookmarkUpdatedAt,
 				Title:     "Test Domain",
 				URL: url.URL{
 					Scheme: "https",
@@ -433,13 +448,8 @@ func TestDecodeBookmark(t *testing.T) {
 }
 
 func assertBookmarksEqual(t *testing.T, got types.Bookmark, want types.Bookmark) {
-	if got.CreatedAt != want.CreatedAt {
-		t.Errorf("want creation date %q, got %q", want.CreatedAt.String(), got.CreatedAt.String())
-	}
-
-	if got.UpdatedAt != want.UpdatedAt {
-		t.Errorf("want update date %q, got %q", want.UpdatedAt.String(), got.UpdatedAt.String())
-	}
+	assertDatesEqual(t, "creation", got.CreatedAt, want.CreatedAt)
+	assertDatesEqual(t, "update", got.UpdatedAt, want.UpdatedAt)
 
 	if got.Title != want.Title {
 		t.Errorf("want title %q, got %q", want.Title, got.Title)

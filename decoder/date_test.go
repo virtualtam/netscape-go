@@ -72,3 +72,23 @@ func TestDecodeDateTime(t *testing.T) {
 		})
 	}
 }
+
+func assertDatesEqual(t *testing.T, name string, got *time.Time, want *time.Time) {
+	t.Helper()
+
+	if want == nil {
+		if got != nil {
+			t.Errorf("want %s datetime nil, got %q", name, got.String())
+		}
+		return
+	}
+
+	if got == nil {
+		t.Errorf("want %s datetime %q, got nil", name, want.String())
+		return
+	}
+
+	if got.String() != want.String() {
+		t.Errorf("want %s date %q, got %q", name, want.String(), got.String())
+	}
+}

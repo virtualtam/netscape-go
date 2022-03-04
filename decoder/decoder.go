@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/virtualtam/netscape-go/ast"
 	"github.com/virtualtam/netscape-go/types"
@@ -15,7 +16,18 @@ func Decode(f ast.File) (types.Document, error) {
 	return d.decodeFile(f)
 }
 
-type Decoder struct{}
+// A Decoder walks a Netscape Bookmark AST and returns the corresponding
+// document.
+type Decoder struct {
+	defaultTime time.Time
+}
+
+// NewDecoder initializes and returns a new Decoder.
+func NewDecoder(defaultTime time.Time) *Decoder {
+	return &Decoder{
+		defaultTime: defaultTime,
+	}
+}
 
 func (d *Decoder) decodeFile(f ast.File) (types.Document, error) {
 	document := types.Document{
@@ -45,13 +57,13 @@ func (d *Decoder) decodeFolder(f ast.Folder) (types.Folder, error) {
 			if err != nil {
 				return types.Folder{}, err
 			}
-			folder.CreatedAt = createdAt
+			folder.CreatedAt = &createdAt
 		case updatedAtAttr:
 			updatedAt, err := decodeDate(value)
 			if err != nil {
 				return types.Folder{}, err
 			}
-			folder.UpdatedAt = updatedAt
+			folder.UpdatedAt = &updatedAt
 		default:
 			folder.Attributes[attr] = value
 		}
@@ -98,13 +110,13 @@ func (d Decoder) decodeBookmark(b ast.Bookmark) (types.Bookmark, error) {
 			if err != nil {
 				return types.Bookmark{}, err
 			}
-			bookmark.CreatedAt = createdAt
+			bookmark.CreatedAt = &createdAt
 		case updatedAtAttr:
 			updatedAt, err := decodeDate(value)
 			if err != nil {
 				return types.Bookmark{}, err
 			}
-			bookmark.UpdatedAt = updatedAt
+			bookmark.UpdatedAt = &updatedAt
 		case privateAttr:
 			if value == "1" {
 				bookmark.Private = true

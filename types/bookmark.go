@@ -7,8 +7,8 @@ import (
 
 // A Bookmark represents a Netscape Bookmark.
 type Bookmark struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 
 	Title string
 	URL   url.URL
