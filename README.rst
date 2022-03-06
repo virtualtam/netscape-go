@@ -9,6 +9,11 @@ using the
 `Netscape Bookmark File Format <https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa753582(v=vs.85)>`_
 , as exported by common Web browsers and bookmarking services.
 
+Change Log
+----------
+
+See `CHANGELOG <./CHANGELOG.rst>`_.
+
 License
 -------
 
