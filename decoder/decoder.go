@@ -10,7 +10,7 @@ import (
 )
 
 // Decode walks a Netscape Bookmark AST and returns the corresponding document.
-func Decode(f ast.File) (types.Document, error) {
+func Decode(f ast.File) (*types.Document, error) {
 	var d Decoder
 	return d.decodeFile(f)
 }
@@ -28,18 +28,18 @@ func NewDecoder(defaultTime time.Time) *Decoder {
 	}
 }
 
-func (d *Decoder) decodeFile(f ast.File) (types.Document, error) {
+func (d *Decoder) decodeFile(f ast.File) (*types.Document, error) {
 	document := types.Document{
 		Title: f.Title,
 	}
 
 	root, err := d.decodeFolder(f.Root)
 	if err != nil {
-		return types.Document{}, err
+		return &types.Document{}, err
 	}
 	document.Root = root
 
-	return document, nil
+	return &document, nil
 }
 
 func (d *Decoder) decodeFolder(f ast.Folder) (types.Folder, error) {

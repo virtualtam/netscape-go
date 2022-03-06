@@ -21,7 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	m, err := netscape.Marshal(&document)
+	m, err := netscape.Marshal(document)
 	if err != nil {
 		fmt.Println("failed to marshal document:", err)
 		os.Exit(1)
