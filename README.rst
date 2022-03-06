@@ -1,6 +1,9 @@
 netscape-go - Parse and export bookmarks using the Netscape format
 ==================================================================
 
+.. image:: https://github.com/virtualtam/netscape-go/actions/workflows/build-and-test.yml/badge.svg?branch=main
+   :alt: Build and test workflow status
+
 ``netscape-go`` provides a library to marshal and unmarshal bookmark collections
 using the
 `Netscape Bookmark File Format <https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa753582(v=vs.85)>`_
