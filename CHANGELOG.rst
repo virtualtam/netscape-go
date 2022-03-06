@@ -23,14 +23,16 @@ Initial release.
 - Add support for nested folders
 - Add support for folder metadata:
 
-    - creation and update dates
-    - arbitrary attributes
-    - text description, with multi-line and inner markup support
+  - creation and update dates
+  - arbitrary attributes
+  - text description, with multi-line and inner markup support
 
 - Add support for bookmark metadata:
 
-    - creation and update dates
-    - visibility
-    - comma-separated tags
-    - arbitrary attributes
-    - text description, with multi-line and inner markup support
+  - creation and update dates
+  - visibility
+  - comma-separated tags
+  - arbitrary attributes
+  - text description, with multi-line and inner markup support
+
+- Provide code and command-line examples to demonstrate usage
