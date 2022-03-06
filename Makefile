@@ -19,7 +19,9 @@ coverhtml: cover
 	go tool cover -html=coverage.out
 .PHONY: coverhtml
 
-build: $(BUILD_DIR)/unmarshal
+build: \
+	$(BUILD_DIR)/roundtrip \
+	$(BUILD_DIR)/unmarshal
 
 $(BUILD_DIR)/%: $(shell find . -type f -name "*.go")
 	go build -trimpath -o $@ ./cmd/$*
