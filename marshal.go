@@ -3,14 +3,27 @@
 package netscape
 
 import (
+	"bytes"
 	"io"
 	"os"
 	"strings"
 
 	"github.com/virtualtam/netscape-go/decoder"
+	"github.com/virtualtam/netscape-go/encoder"
 	"github.com/virtualtam/netscape-go/parser"
 	"github.com/virtualtam/netscape-go/types"
 )
+
+// Marshal returns the Netscape Bookmark encoding of d.
+func Marshal(d *types.Document) ([]byte, error) {
+	var buf bytes.Buffer
+
+	if err := encoder.NewEncoder(&buf).Encode(d); err != nil {
+		return []byte{}, err
+	}
+
+	return buf.Bytes(), nil
+}
 
 // UnmarshalString unmarshals a string representation of a Netscape Bookmark
 // file and returns the corresponding Document.
