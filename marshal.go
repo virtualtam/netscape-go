@@ -25,14 +25,14 @@ func Marshal(d *types.Document) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// UnmarshalString unmarshals a string representation of a Netscape Bookmark
+// Unmarshal unmarshals a []byte representation of a Netscape Bookmark
 // file and returns the corresponding Document.
-func UnmarshalString(data string) (types.Document, error) {
-	r := strings.NewReader(data)
-	return Unmarshal(r)
+func Unmarshal(b []byte) (types.Document, error) {
+	r := bytes.NewReader(b)
+	return unmarshal(r)
 }
 
-// UnmarshalString unmarshals a Netscape Bookmark file and returns the
+// UnmarshalFile unmarshals a Netscape Bookmark file and returns the
 // corresponding Document.
 func UnmarshalFile(filePath string) (types.Document, error) {
 	file, err := os.Open(filePath)
@@ -41,12 +41,17 @@ func UnmarshalFile(filePath string) (types.Document, error) {
 	}
 	defer file.Close()
 
-	return Unmarshal(file)
+	return unmarshal(file)
 }
 
-// UnmarshalString unmarshals a Netscape Bookmark file using the provided
-// io.ReadSeeker and returns the corresponding Document.
-func Unmarshal(r io.ReadSeeker) (types.Document, error) {
+// UnmarshalString unmarshals a string representation of a Netscape Bookmark
+// file and returns the corresponding Document.
+func UnmarshalString(data string) (types.Document, error) {
+	r := strings.NewReader(data)
+	return unmarshal(r)
+}
+
+func unmarshal(r io.ReadSeeker) (types.Document, error) {
 	astFile, err := parser.Parse(r)
 	if err != nil {
 		return types.Document{}, err
