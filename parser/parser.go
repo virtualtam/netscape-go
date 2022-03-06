@@ -1,3 +1,4 @@
+// Package parser implements a parser for Netscape Bookmark files.
 package parser
 
 import (

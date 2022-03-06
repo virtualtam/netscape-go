@@ -1,3 +1,5 @@
+// Package ast declares the types used to represent syntax trees for Netscape
+// Bookmark files.
 package ast
 
 // A File Node represents a Netscape Bookmark file.

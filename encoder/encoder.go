@@ -1,4 +1,5 @@
-// package encoder implements Netscape Bookmark encoding.
+// Package encoder implements encoding and printing of domain types for Netscape
+// Bookmark files.
 package encoder
 
 import (

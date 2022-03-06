@@ -1,3 +1,5 @@
+// Package decoder implements decoding to convert AST nodes to Netscape Bookmark
+// domain types.
 package decoder
 
 import (
