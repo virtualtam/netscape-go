@@ -1,4 +1,7 @@
+bench/
 build/
+
+netscape-go.test
 
 coverage.out
 coverage.html
