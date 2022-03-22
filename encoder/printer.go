@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/xml"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/virtualtam/netscape-go/types"
@@ -67,8 +68,14 @@ func newNetscapeH3(f *types.Folder) *netscapeH3 {
 		h3.LastModified = fmt.Sprintf("%d", f.UpdatedAt.Unix())
 	}
 
-	for k, v := range f.Attributes {
-		attr := xml.Attr{Name: xml.Name{Local: k}, Value: v}
+	var keys []string
+	for k := range f.Attributes {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		attr := xml.Attr{Name: xml.Name{Local: k}, Value: f.Attributes[k]}
 		h3.Attrs = append(h3.Attrs, attr)
 	}
 
@@ -173,8 +180,14 @@ func newNetscapeA(b *types.Bookmark) *netscapeA {
 		a.Private = 1
 	}
 
-	for k, v := range b.Attributes {
-		attr := xml.Attr{Name: xml.Name{Local: k}, Value: v}
+	var keys []string
+	for k := range b.Attributes {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		attr := xml.Attr{Name: xml.Name{Local: k}, Value: b.Attributes[k]}
 		a.Attrs = append(a.Attrs, attr)
 	}
 
