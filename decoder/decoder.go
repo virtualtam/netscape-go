@@ -4,6 +4,7 @@ package decoder
 
 import (
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,13 +21,19 @@ func Decode(f ast.File) (*types.Document, error) {
 // A Decoder walks a Netscape Bookmark AST and returns the corresponding
 // document.
 type Decoder struct {
-	defaultTime time.Time
+	now     time.Time
+	maxTime time.Time
 }
 
 // NewDecoder initializes and returns a new Decoder.
-func NewDecoder(defaultTime time.Time) *Decoder {
+func NewDecoder() *Decoder {
+	now := time.Now().UTC()
+	rangeYears := 30
+	maxTime := now.AddDate(rangeYears, 0, 0)
+
 	return &Decoder{
-		defaultTime: defaultTime,
+		now:     now,
+		maxTime: maxTime,
 	}
 }
 
@@ -54,13 +61,13 @@ func (d *Decoder) decodeFolder(f ast.Folder) (types.Folder, error) {
 	for attr, value := range f.Attributes {
 		switch attr {
 		case createdAtAttr:
-			createdAt, err := decodeDate(value)
+			createdAt, err := d.decodeDate(value)
 			if err != nil {
 				return types.Folder{}, err
 			}
 			folder.CreatedAt = &createdAt
 		case updatedAtAttr:
-			updatedAt, err := decodeDate(value)
+			updatedAt, err := d.decodeDate(value)
 			if err != nil {
 				return types.Folder{}, err
 			}
@@ -102,13 +109,13 @@ func (d Decoder) decodeBookmark(b ast.Bookmark) (types.Bookmark, error) {
 	for attr, value := range b.Attributes {
 		switch attr {
 		case createdAtAttr:
-			createdAt, err := decodeDate(value)
+			createdAt, err := d.decodeDate(value)
 			if err != nil {
 				return types.Bookmark{}, err
 			}
 			bookmark.CreatedAt = &createdAt
 		case updatedAtAttr:
-			updatedAt, err := decodeDate(value)
+			updatedAt, err := d.decodeDate(value)
 			if err != nil {
 				return types.Bookmark{}, err
 			}
@@ -141,4 +148,83 @@ func (d *Decoder) decodeTags(attr map[string]string) []string {
 	sort.Strings(tags)
 
 	return tags
+}
+
+func (d *Decoder) decodeDate(input string) (time.Time, error) {
+	// First, attempt to parse the date as a UNIX epoch, which is the most
+	// commonly used format.
+	unixTime, err := strconv.ParseInt(input, 10, 64)
+	if err == nil {
+		return d.decodeUnixDate(unixTime), nil
+	}
+
+	// Attempt to parse the date as RFC3339
+	date, err := d.decodeRFC3339Date(input)
+	if err == nil {
+		return date, nil
+	}
+
+	// Attempt to parse the date as Comon Log
+	date, err = d.decodeCommonLogDate(input)
+	if err == nil {
+		return date, nil
+	}
+
+	return time.Time{}, err
+}
+
+const (
+	commonLogLayout string = "02/Jan/2006:15:04:05 -0700"
+)
+
+// decodeCommonLogDate returns the time.Time corresponding to a date formatted
+// in the Common Log format.
+func (d *Decoder) decodeCommonLogDate(input string) (time.Time, error) {
+	date, err := time.Parse(commonLogLayout, input)
+	if err == nil {
+		return date.UTC(), nil
+	}
+
+	return time.Time{}, err
+}
+
+// decodeRFC3339Date returns the time.Time corresponding to a RFC3339
+// representation.
+func (d *Decoder) decodeRFC3339Date(input string) (time.Time, error) {
+	date, err := time.Parse(time.RFC3339, input)
+	if err == nil {
+		return date.UTC(), nil
+	}
+
+	date, err = time.Parse(time.RFC3339Nano, input)
+	if err == nil {
+		return date.UTC(), nil
+	}
+
+	return time.Time{}, err
+}
+
+// decodeUnixDate returns the time.Time corresponding to a UNIX timestamp.
+//
+// Dates are usually specified in seconds, but some browsers and bookmarking
+// services may use milliseconds, microseconds or nanoseconds.
+//
+// To address these cases, we ensure the resulting time.Time is comprised in a
+// reasonable interval (ie not further than N years in the future).
+func (d *Decoder) decodeUnixDate(unixTime int64) time.Time {
+	date := time.Unix(unixTime, 0).UTC()
+
+	if date.After(d.maxTime) {
+		date = time.UnixMilli(unixTime).UTC()
+	}
+
+	if date.After(d.maxTime) {
+		date = time.UnixMicro(unixTime).UTC()
+	}
+
+	if date.After(d.maxTime) {
+		date = time.Unix(0, unixTime).UTC()
+	}
+
+	return date
 }
