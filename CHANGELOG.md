@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v2.0.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.0.0) - 2022-04-30
+### Added
+
+- Add a method to flatten a Document by returning a version with all bookmarks
+  attached to the root folder
+
+### Changed
+
+- Bump Go module to v2
+- Flatten and cleanup package structure to ease importing and using as a library
+
+
 ## [v1.1.0](https://github.com/virtualtam/netscape-go/releases/tag/v1.1.0) - 2022-03-25
 ### Added
 
