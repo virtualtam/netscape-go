@@ -7,18 +7,13 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"github.com/virtualtam/netscape-go/decoder"
-	"github.com/virtualtam/netscape-go/encoder"
-	"github.com/virtualtam/netscape-go/parser"
-	"github.com/virtualtam/netscape-go/types"
 )
 
 // Marshal returns the Netscape Bookmark encoding of d.
-func Marshal(d *types.Document) ([]byte, error) {
+func Marshal(d *Document) ([]byte, error) {
 	var buf bytes.Buffer
 
-	if err := encoder.NewEncoder(&buf).Encode(d); err != nil {
+	if err := NewEncoder(&buf).Encode(d); err != nil {
 		return []byte{}, err
 	}
 
@@ -27,17 +22,17 @@ func Marshal(d *types.Document) ([]byte, error) {
 
 // Unmarshal unmarshals a []byte representation of a Netscape Bookmark
 // file and returns the corresponding Document.
-func Unmarshal(b []byte) (*types.Document, error) {
+func Unmarshal(b []byte) (*Document, error) {
 	r := bytes.NewReader(b)
 	return unmarshal(r)
 }
 
 // UnmarshalFile unmarshals a Netscape Bookmark file and returns the
 // corresponding Document.
-func UnmarshalFile(filePath string) (*types.Document, error) {
+func UnmarshalFile(filePath string) (*Document, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return &types.Document{}, err
+		return &Document{}, err
 	}
 	defer file.Close()
 
@@ -46,16 +41,16 @@ func UnmarshalFile(filePath string) (*types.Document, error) {
 
 // UnmarshalString unmarshals a string representation of a Netscape Bookmark
 // file and returns the corresponding Document.
-func UnmarshalString(data string) (*types.Document, error) {
+func UnmarshalString(data string) (*Document, error) {
 	r := strings.NewReader(data)
 	return unmarshal(r)
 }
 
-func unmarshal(r io.ReadSeeker) (*types.Document, error) {
-	astFile, err := parser.Parse(r)
+func unmarshal(r io.ReadSeeker) (*Document, error) {
+	astFile, err := Parse(r)
 	if err != nil {
-		return &types.Document{}, err
+		return &Document{}, err
 	}
 
-	return decoder.Decode(*astFile)
+	return Decode(*astFile)
 }

@@ -1,6 +1,4 @@
-// Package encoder implements encoding and printing of domain types for Netscape
-// Bookmark files.
-package encoder
+package netscape
 
 import (
 	"bufio"
@@ -9,8 +7,6 @@ import (
 	"io"
 	"sort"
 	"strings"
-
-	"github.com/virtualtam/netscape-go/types"
 )
 
 // An Encoder writes Netscape Bookmark data to an output stream.
@@ -29,7 +25,7 @@ func NewEncoder(w io.Writer) *Encoder {
 }
 
 // Encode writes the Netscape Bookmark encoding of d to the stream.
-func (e *Encoder) Encode(d *types.Document) error {
+func (e *Encoder) Encode(d *Document) error {
 	if err := e.p.marshalDocument(d); err != nil {
 		return err
 	}
@@ -52,7 +48,7 @@ func (p *printer) writeString(s string) (int, error) {
 	return p.WriteString(s)
 }
 
-func (p *printer) marshalDocument(d *types.Document) error {
+func (p *printer) marshalDocument(d *Document) error {
 	const header = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <!-- This is an automatically generated file.
      It will be read and overwritten.
@@ -81,7 +77,7 @@ type netscapeH3 struct {
 	Attrs []xml.Attr `xml:",attr,omitempty"`
 }
 
-func newNetscapeH3(f *types.Folder) *netscapeH3 {
+func newNetscapeH3(f *Folder) *netscapeH3 {
 	h3 := netscapeH3{
 		Name: f.Name,
 	}
@@ -108,7 +104,7 @@ func newNetscapeH3(f *types.Folder) *netscapeH3 {
 	return &h3
 }
 
-func (p *printer) marshalFolderHeader(f *types.Folder) error {
+func (p *printer) marshalFolderHeader(f *Folder) error {
 	h3 := newNetscapeH3(f)
 
 	m, err := xml.Marshal(h3)
@@ -124,7 +120,7 @@ func (p *printer) marshalFolderHeader(f *types.Folder) error {
 	return nil
 }
 
-func (p *printer) marshalFolder(f *types.Folder, isRoot bool) error {
+func (p *printer) marshalFolder(f *Folder, isRoot bool) error {
 	if !isRoot {
 		if err := p.marshalFolderHeader(f); err != nil {
 			return err
@@ -186,7 +182,7 @@ type netscapeA struct {
 	Attrs []xml.Attr `xml:",attr,omitempty"`
 }
 
-func newNetscapeA(b *types.Bookmark) *netscapeA {
+func newNetscapeA(b *Bookmark) *netscapeA {
 	a := netscapeA{
 		Href:  b.Href,
 		Title: b.Title,
@@ -220,7 +216,7 @@ func newNetscapeA(b *types.Bookmark) *netscapeA {
 	return &a
 }
 
-func (p *printer) marshalBookmark(b *types.Bookmark) error {
+func (p *printer) marshalBookmark(b *Bookmark) error {
 	a := newNetscapeA(b)
 
 	m, err := xml.Marshal(a)

@@ -1,15 +1,10 @@
-// Package decoder implements decoding to convert AST nodes to Netscape Bookmark
-// domain types.
-package decoder
+package netscape
 
 import (
 	"sort"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/virtualtam/netscape-go/ast"
-	"github.com/virtualtam/netscape-go/types"
 )
 
 const (
@@ -20,7 +15,7 @@ const (
 )
 
 // Decode walks a Netscape Bookmark AST and returns the corresponding document.
-func Decode(f ast.FileNode) (*types.Document, error) {
+func Decode(f FileNode) (*Document, error) {
 	var d Decoder
 	return d.decodeFile(f)
 }
@@ -44,22 +39,22 @@ func NewDecoder() *Decoder {
 	}
 }
 
-func (d *Decoder) decodeFile(f ast.FileNode) (*types.Document, error) {
-	document := types.Document{
+func (d *Decoder) decodeFile(f FileNode) (*Document, error) {
+	document := Document{
 		Title: f.Title,
 	}
 
 	root, err := d.decodeFolder(f.Root)
 	if err != nil {
-		return &types.Document{}, err
+		return &Document{}, err
 	}
 	document.Root = root
 
 	return &document, nil
 }
 
-func (d *Decoder) decodeFolder(f ast.FolderNode) (types.Folder, error) {
-	folder := types.Folder{
+func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
+	folder := Folder{
 		Name:        f.Name,
 		Description: f.Description,
 		Attributes:  map[string]string{},
@@ -70,13 +65,13 @@ func (d *Decoder) decodeFolder(f ast.FolderNode) (types.Folder, error) {
 		case createdAtAttr:
 			createdAt, err := d.decodeDate(value)
 			if err != nil {
-				return types.Folder{}, err
+				return Folder{}, err
 			}
 			folder.CreatedAt = &createdAt
 		case updatedAtAttr:
 			updatedAt, err := d.decodeDate(value)
 			if err != nil {
-				return types.Folder{}, err
+				return Folder{}, err
 			}
 			folder.UpdatedAt = &updatedAt
 		default:
@@ -87,7 +82,7 @@ func (d *Decoder) decodeFolder(f ast.FolderNode) (types.Folder, error) {
 	for _, b := range f.Bookmarks {
 		bookmark, err := d.decodeBookmark(b)
 		if err != nil {
-			return types.Folder{}, err
+			return Folder{}, err
 		}
 
 		folder.Bookmarks = append(folder.Bookmarks, bookmark)
@@ -96,7 +91,7 @@ func (d *Decoder) decodeFolder(f ast.FolderNode) (types.Folder, error) {
 	for _, sf := range f.Subfolders {
 		subfolder, err := d.decodeFolder(sf)
 		if err != nil {
-			return types.Folder{}, err
+			return Folder{}, err
 		}
 
 		folder.Subfolders = append(folder.Subfolders, subfolder)
@@ -105,8 +100,8 @@ func (d *Decoder) decodeFolder(f ast.FolderNode) (types.Folder, error) {
 	return folder, nil
 }
 
-func (d Decoder) decodeBookmark(b ast.BookmarkNode) (types.Bookmark, error) {
-	bookmark := types.Bookmark{
+func (d Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
+	bookmark := Bookmark{
 		Description: b.Description,
 		Href:        b.Href,
 		Title:       b.Title,
@@ -118,13 +113,13 @@ func (d Decoder) decodeBookmark(b ast.BookmarkNode) (types.Bookmark, error) {
 		case createdAtAttr:
 			createdAt, err := d.decodeDate(value)
 			if err != nil {
-				return types.Bookmark{}, err
+				return Bookmark{}, err
 			}
 			bookmark.CreatedAt = &createdAt
 		case updatedAtAttr:
 			updatedAt, err := d.decodeDate(value)
 			if err != nil {
-				return types.Bookmark{}, err
+				return Bookmark{}, err
 			}
 			bookmark.UpdatedAt = &updatedAt
 		case privateAttr:

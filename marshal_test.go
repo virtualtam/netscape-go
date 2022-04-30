@@ -3,8 +3,6 @@ package netscape
 import (
 	"testing"
 	"time"
-
-	"github.com/virtualtam/netscape-go/types"
 )
 
 func TestMarshal(t *testing.T) {
@@ -15,7 +13,7 @@ func TestMarshal(t *testing.T) {
 
 	cases := []struct {
 		tname    string
-		document types.Document
+		document Document
 		want     string
 	}{
 		{
@@ -33,11 +31,11 @@ func TestMarshal(t *testing.T) {
 
 		{
 			tname: "document with bookmarks",
-			document: types.Document{
+			document: Document{
 				Title: "Bookmarks",
-				Root: types.Folder{
+				Root: Folder{
 					Name: "Bookmarks",
-					Bookmarks: []types.Bookmark{
+					Bookmarks: []Bookmark{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -66,17 +64,17 @@ func TestMarshal(t *testing.T) {
 
 		{
 			tname: "document with private bookmarks and dates",
-			document: types.Document{
+			document: Document{
 				Title: "Bookmarks",
-				Root: types.Folder{
+				Root: Folder{
 					Name: "Bookmarks",
-					Subfolders: []types.Folder{
+					Subfolders: []Folder{
 						{
 							Name:        "Favorites",
 							Description: "Add bookmarks here",
 							CreatedAt:   &folderCreatedAt,
 							UpdatedAt:   &folderUpdatedAt,
-							Bookmarks: []types.Bookmark{
+							Bookmarks: []Bookmark{
 								{
 									CreatedAt: &bookmarkCreatedAt,
 									Href:      "https://domain.tld",

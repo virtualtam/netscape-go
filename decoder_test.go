@@ -1,30 +1,27 @@
-package decoder
+package netscape
 
 import (
 	"testing"
 	"time"
-
-	"github.com/virtualtam/netscape-go/ast"
-	"github.com/virtualtam/netscape-go/types"
 )
 
 func TestDecodeFile(t *testing.T) {
 	cases := []struct {
 		tname string
-		file  ast.FileNode
-		want  types.Document
+		file  FileNode
+		want  Document
 	}{
 		{
 			tname: "empty document",
 		},
 		{
 			tname: "flat document",
-			file: ast.FileNode{
+			file: FileNode{
 				Title: "Bookmarks",
-				Root: ast.FolderNode{
+				Root: FolderNode{
 					Name:        "Test Folder",
 					Description: "Add bookmarks to this folder",
-					Bookmarks: []ast.BookmarkNode{
+					Bookmarks: []BookmarkNode{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -37,12 +34,12 @@ func TestDecodeFile(t *testing.T) {
 					},
 				},
 			},
-			want: types.Document{
+			want: Document{
 				Title: "Bookmarks",
-				Root: types.Folder{
+				Root: Folder{
 					Name:        "Test Folder",
 					Description: "Add bookmarks to this folder",
-					Bookmarks: []types.Bookmark{
+					Bookmarks: []Bookmark{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -83,36 +80,36 @@ func TestDecodeFolder(t *testing.T) {
 
 	cases := []struct {
 		tname string
-		input ast.FolderNode
-		want  types.Folder
+		input FolderNode
+		want  Folder
 	}{
 		{
 			tname: "empty folder",
-			input: ast.FolderNode{
+			input: FolderNode{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 			},
-			want: types.Folder{
+			want: Folder{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 			},
 		},
 		{
 			tname: "empty folder with creation date",
-			input: ast.FolderNode{
+			input: FolderNode{
 				Name: "Test Folder",
 				Attributes: map[string]string{
 					"ADD_DATE": "1646154673",
 				},
 			},
-			want: types.Folder{
+			want: Folder{
 				CreatedAt: &folderCreatedAt,
 				Name:      "Test Folder",
 			},
 		},
 		{
 			tname: "empty folder with creation and update dates, and extra attributes",
-			input: ast.FolderNode{
+			input: FolderNode{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 				Attributes: map[string]string{
@@ -121,7 +118,7 @@ func TestDecodeFolder(t *testing.T) {
 					"PERSONAL_TOOLBAR_FOLDER": "true",
 				},
 			},
-			want: types.Folder{
+			want: Folder{
 				CreatedAt:   &folderCreatedAt,
 				UpdatedAt:   &folderUpdatedAt,
 				Name:        "Test Folder",
@@ -133,10 +130,10 @@ func TestDecodeFolder(t *testing.T) {
 		},
 		{
 			tname: "folder with bookmarks",
-			input: ast.FolderNode{
+			input: FolderNode{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
-				Bookmarks: []ast.BookmarkNode{
+				Bookmarks: []BookmarkNode{
 					{
 						Href:  "https://domain.tld",
 						Title: "Test Domain",
@@ -148,10 +145,10 @@ func TestDecodeFolder(t *testing.T) {
 					},
 				},
 			},
-			want: types.Folder{
+			want: Folder{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
-				Bookmarks: []types.Bookmark{
+				Bookmarks: []Bookmark{
 					{
 						Href:  "https://domain.tld",
 						Title: "Test Domain",
@@ -166,10 +163,10 @@ func TestDecodeFolder(t *testing.T) {
 		},
 		{
 			tname: "folder with sub-folders and bookmarks",
-			input: ast.FolderNode{
+			input: FolderNode{
 				Name:        "Bookmarks",
 				Description: "Root Folder",
-				Bookmarks: []ast.BookmarkNode{
+				Bookmarks: []BookmarkNode{
 					{
 						Href:  "https://domain.tld",
 						Title: "Test Domain",
@@ -180,13 +177,13 @@ func TestDecodeFolder(t *testing.T) {
 						Title:       "Test Domain II",
 					},
 				},
-				Subfolders: []ast.FolderNode{
+				Subfolders: []FolderNode{
 					{
 						Name: "Empty",
 					},
 					{
 						Name: "Personal Toolbar",
-						Bookmarks: []ast.BookmarkNode{
+						Bookmarks: []BookmarkNode{
 							{
 								Href:  "https://personal.tld",
 								Title: "Personal Domain",
@@ -200,10 +197,10 @@ func TestDecodeFolder(t *testing.T) {
 					},
 				},
 			},
-			want: types.Folder{
+			want: Folder{
 				Name:        "Bookmarks",
 				Description: "Root Folder",
-				Bookmarks: []types.Bookmark{
+				Bookmarks: []Bookmark{
 					{
 						Href:  "https://domain.tld",
 						Title: "Test Domain",
@@ -214,13 +211,13 @@ func TestDecodeFolder(t *testing.T) {
 						Title:       "Test Domain II",
 					},
 				},
-				Subfolders: []types.Folder{
+				Subfolders: []Folder{
 					{
 						Name: "Empty",
 					},
 					{
 						Name: "Personal Toolbar",
-						Bookmarks: []types.Bookmark{
+						Bookmarks: []Bookmark{
 							{
 								Href:  "https://personal.tld",
 								Title: "Personal Domain",
@@ -252,7 +249,7 @@ func TestDecodeFolder(t *testing.T) {
 	}
 }
 
-func assertFoldersEqual(t *testing.T, got types.Folder, want types.Folder) {
+func assertFoldersEqual(t *testing.T, got Folder, want Folder) {
 	t.Helper()
 
 	assertDatesEqual(t, "creation", got.CreatedAt, want.CreatedAt)
@@ -291,28 +288,28 @@ func TestDecodeBookmark(t *testing.T) {
 
 	cases := []struct {
 		tname string
-		input ast.BookmarkNode
-		want  types.Bookmark
+		input BookmarkNode
+		want  Bookmark
 	}{
 		{
 			tname: "bookmark with mandatory information only",
-			input: ast.BookmarkNode{
+			input: BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 			},
-			want: types.Bookmark{
+			want: Bookmark{
 				Title: "Test Domain",
 				Href:  "https://domain.tld",
 			},
 		},
 		{
 			tname: "bookmark with multi-line description",
-			input: ast.BookmarkNode{
+			input: BookmarkNode{
 				Description: "Nested lists:\n- list1\n  - item1.1\n  - item1.2\n  - item1.3\n- list2\n  - item2.1",
 				Href:        "https://domain.tld",
 				Title:       "Test Domain",
 			},
-			want: types.Bookmark{
+			want: Bookmark{
 				Title:       "Test Domain",
 				Href:        "https://domain.tld",
 				Description: "Nested lists:\n- list1\n  - item1.1\n  - item1.2\n  - item1.3\n- list2\n  - item2.1",
@@ -320,7 +317,7 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "bookmark with creation and update date",
-			input: ast.BookmarkNode{
+			input: BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
@@ -328,7 +325,7 @@ func TestDecodeBookmark(t *testing.T) {
 					"LAST_MODIFIED": "1646172586",
 				},
 			},
-			want: types.Bookmark{
+			want: Bookmark{
 				CreatedAt: &bookmarkCreatedAt,
 				UpdatedAt: &bookmarkUpdatedAt,
 				Title:     "Test Domain",
@@ -337,14 +334,14 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "private bookmark",
-			input: ast.BookmarkNode{
+			input: BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
 					"PRIVATE": "1",
 				},
 			},
-			want: types.Bookmark{
+			want: Bookmark{
 				Title:   "Test Domain",
 				Href:    "https://domain.tld",
 				Private: true,
@@ -352,14 +349,14 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "bookmark with comma-separated tags and extra whitespace",
-			input: ast.BookmarkNode{
+			input: BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
 					"TAGS": "test, netscape,     bookmark",
 				},
 			},
-			want: types.Bookmark{
+			want: Bookmark{
 				Title: "Test Domain",
 				Href:  "https://domain.tld",
 				Tags: []string{
@@ -371,7 +368,7 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "bookmark with extra attributes",
-			input: ast.BookmarkNode{
+			input: BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
@@ -380,7 +377,7 @@ func TestDecodeBookmark(t *testing.T) {
 					"PRIVATE":      "1",
 				},
 			},
-			want: types.Bookmark{
+			want: Bookmark{
 				Title:   "Test Domain",
 				Href:    "https://domain.tld",
 				Private: true,
@@ -407,7 +404,7 @@ func TestDecodeBookmark(t *testing.T) {
 	}
 }
 
-func assertBookmarksEqual(t *testing.T, got types.Bookmark, want types.Bookmark) {
+func assertBookmarksEqual(t *testing.T, got Bookmark, want Bookmark) {
 	assertDatesEqual(t, "creation", got.CreatedAt, want.CreatedAt)
 	assertDatesEqual(t, "update", got.UpdatedAt, want.UpdatedAt)
 

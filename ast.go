@@ -1,6 +1,4 @@
-// Package ast declares the types used to represent syntax trees for Netscape
-// Bookmark files.
-package ast
+package netscape
 
 // A FileNode represents a Netscape Bookmark file.
 type FileNode struct {

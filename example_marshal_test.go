@@ -4,15 +4,14 @@ import (
 	"fmt"
 
 	"github.com/virtualtam/netscape-go"
-	"github.com/virtualtam/netscape-go/types"
 )
 
 func ExampleMarshal() {
-	document := types.Document{
+	document := netscape.Document{
 		Title: "Bookmarks",
-		Root: types.Folder{
+		Root: netscape.Folder{
 			Name: "Bookmarks",
-			Bookmarks: []types.Bookmark{
+			Bookmarks: []netscape.Bookmark{
 				{
 					Href:  "https://domain.tld",
 					Title: "Test Domain",
@@ -23,10 +22,10 @@ func ExampleMarshal() {
 					Title:       "Local Test Domain",
 				},
 			},
-			Subfolders: []types.Folder{
+			Subfolders: []netscape.Folder{
 				{
 					Name: "Sub",
-					Bookmarks: []types.Bookmark{
+					Bookmarks: []netscape.Bookmark{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
