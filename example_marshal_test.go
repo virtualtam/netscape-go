@@ -13,12 +13,12 @@ func ExampleMarshal() {
 			Name: "Bookmarks",
 			Bookmarks: []netscape.Bookmark{
 				{
-					Href:  "https://domain.tld",
+					URL:   "https://domain.tld",
 					Title: "Test Domain",
 				},
 				{
 					Description: "Local\nLocal\nLocal",
-					Href:        "https://local.domain.tld",
+					URL:         "https://local.domain.tld",
 					Title:       "Local Test Domain",
 				},
 			},
@@ -27,7 +27,7 @@ func ExampleMarshal() {
 					Name: "Sub",
 					Bookmarks: []netscape.Bookmark{
 						{
-							Href:  "https://domain.tld",
+							URL:   "https://domain.tld",
 							Title: "Test Domain",
 							Attributes: map[string]string{
 								"ATTR1": "v1",
@@ -36,7 +36,7 @@ func ExampleMarshal() {
 						},
 						{
 							Description: "Local\nLocal\nLocal",
-							Href:        "https://local.domain.tld",
+							URL:         "https://local.domain.tld",
 							Title:       "Local Test Domain",
 						},
 					},

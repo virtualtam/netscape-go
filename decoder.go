@@ -103,7 +103,7 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 func (d Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
 	bookmark := Bookmark{
 		Description: b.Description,
-		Href:        b.Href,
+		URL:         b.Href,
 		Title:       b.Title,
 		Attributes:  map[string]string{},
 	}

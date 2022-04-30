@@ -1,7 +1,6 @@
 package netscape
 
 import (
-	"net/url"
 	"time"
 )
 
@@ -31,15 +30,11 @@ type Bookmark struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 
 	Title string `json:"title"`
-	Href  string `json:"url"`
+	URL   string `json:"url"`
 
 	Description string   `json:"description,omitempty"`
 	Private     bool     `json:"private"`
 	Tags        []string `json:"tags,omitempty"`
 
 	Attributes map[string]string `json:"attributes,omitempty"`
-}
-
-func (b *Bookmark) URL() (*url.URL, error) {
-	return url.Parse(b.Href)
 }

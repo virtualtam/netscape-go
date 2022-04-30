@@ -184,7 +184,7 @@ type netscapeA struct {
 
 func newNetscapeA(b *Bookmark) *netscapeA {
 	a := netscapeA{
-		Href:  b.Href,
+		Href:  b.URL,
 		Title: b.Title,
 		Tags:  strings.Join(b.Tags, ","),
 		Attrs: []xml.Attr{},

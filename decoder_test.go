@@ -41,12 +41,12 @@ func TestDecodeFile(t *testing.T) {
 					Description: "Add bookmarks to this folder",
 					Bookmarks: []Bookmark{
 						{
-							Href:  "https://domain.tld",
+							URL:   "https://domain.tld",
 							Title: "Test Domain",
 						},
 						{
 							Description: "Second test",
-							Href:        "https://test.domain.tld",
+							URL:         "https://test.domain.tld",
 							Title:       "Test Domain II",
 						},
 					},
@@ -150,12 +150,12 @@ func TestDecodeFolder(t *testing.T) {
 				Description: "Add bookmarks to this folder",
 				Bookmarks: []Bookmark{
 					{
-						Href:  "https://domain.tld",
+						URL:   "https://domain.tld",
 						Title: "Test Domain",
 					},
 					{
 						Description: "Second test",
-						Href:        "https://test.domain.tld",
+						URL:         "https://test.domain.tld",
 						Title:       "Test Domain II",
 					},
 				},
@@ -202,12 +202,12 @@ func TestDecodeFolder(t *testing.T) {
 				Description: "Root Folder",
 				Bookmarks: []Bookmark{
 					{
-						Href:  "https://domain.tld",
+						URL:   "https://domain.tld",
 						Title: "Test Domain",
 					},
 					{
 						Description: "Second test",
-						Href:        "https://test.domain.tld",
+						URL:         "https://test.domain.tld",
 						Title:       "Test Domain II",
 					},
 				},
@@ -219,12 +219,12 @@ func TestDecodeFolder(t *testing.T) {
 						Name: "Personal Toolbar",
 						Bookmarks: []Bookmark{
 							{
-								Href:  "https://personal.tld",
+								URL:   "https://personal.tld",
 								Title: "Personal Domain",
 							},
 							{
 								Description: "Weather Reports",
-								Href:        "https://weather.tld",
+								URL:         "https://weather.tld",
 								Title:       "Weather Reports",
 							},
 						},
@@ -299,7 +299,7 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 			want: Bookmark{
 				Title: "Test Domain",
-				Href:  "https://domain.tld",
+				URL:   "https://domain.tld",
 			},
 		},
 		{
@@ -311,7 +311,7 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 			want: Bookmark{
 				Title:       "Test Domain",
-				Href:        "https://domain.tld",
+				URL:         "https://domain.tld",
 				Description: "Nested lists:\n- list1\n  - item1.1\n  - item1.2\n  - item1.3\n- list2\n  - item2.1",
 			},
 		},
@@ -329,7 +329,7 @@ func TestDecodeBookmark(t *testing.T) {
 				CreatedAt: &bookmarkCreatedAt,
 				UpdatedAt: &bookmarkUpdatedAt,
 				Title:     "Test Domain",
-				Href:      "https://domain.tld",
+				URL:       "https://domain.tld",
 			},
 		},
 		{
@@ -343,7 +343,7 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 			want: Bookmark{
 				Title:   "Test Domain",
-				Href:    "https://domain.tld",
+				URL:     "https://domain.tld",
 				Private: true,
 			},
 		},
@@ -358,7 +358,7 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 			want: Bookmark{
 				Title: "Test Domain",
-				Href:  "https://domain.tld",
+				URL:   "https://domain.tld",
 				Tags: []string{
 					"bookmark",
 					"netscape",
@@ -379,7 +379,7 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 			want: Bookmark{
 				Title:   "Test Domain",
-				Href:    "https://domain.tld",
+				URL:     "https://domain.tld",
 				Private: true,
 				Attributes: map[string]string{
 					"ICON_URI":     "https://domain.tld/favicon.ico",
@@ -412,8 +412,8 @@ func assertBookmarksEqual(t *testing.T, got Bookmark, want Bookmark) {
 		t.Errorf("want title %q, got %q", want.Title, got.Title)
 	}
 
-	if got.Href != want.Href {
-		t.Errorf("want URL string %q, got %q", want.Href, got.Href)
+	if got.URL != want.URL {
+		t.Errorf("want URL string %q, got %q", want.URL, got.URL)
 	}
 
 	if got.Description != want.Description {

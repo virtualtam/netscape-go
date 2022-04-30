@@ -37,12 +37,12 @@ func TestMarshal(t *testing.T) {
 					Name: "Bookmarks",
 					Bookmarks: []Bookmark{
 						{
-							Href:  "https://domain.tld",
+							URL:   "https://domain.tld",
 							Title: "Test Domain",
 						},
 						{
 							Description: "Second test",
-							Href:        "https://test.domain.tld",
+							URL:         "https://test.domain.tld",
 							Title:       "Test Domain II",
 						},
 					},
@@ -77,7 +77,7 @@ func TestMarshal(t *testing.T) {
 							Bookmarks: []Bookmark{
 								{
 									CreatedAt: &bookmarkCreatedAt,
-									Href:      "https://domain.tld",
+									URL:       "https://domain.tld",
 									Title:     "Test Domain",
 									Private:   true,
 								},
@@ -85,7 +85,7 @@ func TestMarshal(t *testing.T) {
 									CreatedAt:   &bookmarkCreatedAt,
 									UpdatedAt:   &bookmarkUpdatedAt,
 									Description: "Second test",
-									Href:        "https://test.domain.tld",
+									URL:         "https://test.domain.tld",
 									Title:       "Test Domain II",
 									Private:     true,
 								},
