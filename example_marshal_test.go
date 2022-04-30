@@ -3,7 +3,7 @@ package netscape_test
 import (
 	"fmt"
 
-	"github.com/virtualtam/netscape-go"
+	"github.com/virtualtam/netscape-go/v2"
 )
 
 func ExampleMarshal() {

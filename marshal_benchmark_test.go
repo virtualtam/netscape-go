@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/virtualtam/netscape-go"
+	"github.com/virtualtam/netscape-go/v2"
 )
 
 var (

@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/virtualtam/netscape-go"
+	"github.com/virtualtam/netscape-go/v2"
 )
 
 func main() {

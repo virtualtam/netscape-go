@@ -1,3 +1,3 @@
-module github.com/virtualtam/netscape-go
+module github.com/virtualtam/netscape-go/v2
 
 go 1.17
