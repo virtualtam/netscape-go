@@ -12,6 +12,13 @@ import (
 	"github.com/virtualtam/netscape-go/types"
 )
 
+const (
+	createdAtAttr string = "ADD_DATE"
+	updatedAtAttr string = "LAST_MODIFIED"
+	privateAttr   string = "PRIVATE"
+	tagsAttr      string = "TAGS"
+)
+
 // Decode walks a Netscape Bookmark AST and returns the corresponding document.
 func Decode(f ast.FileNode) (*types.Document, error) {
 	var d Decoder
