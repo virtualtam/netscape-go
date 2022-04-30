@@ -10,6 +10,17 @@ type Document struct {
 	Root  Folder `json:"root"`
 }
 
+// Flatten returns a flat version of this Document, with all Bookmarks attached
+// to the Root Folder.
+func (d *Document) Flatten() *Document {
+	flattenedRoot := d.Root.flatten()
+
+	return &Document{
+		Title: d.Title,
+		Root:  *flattenedRoot,
+	}
+}
+
 // A Folder represents a folder containing Netscape Bookmarks and child Folders.
 type Folder struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
@@ -22,6 +33,25 @@ type Folder struct {
 
 	Bookmarks  []Bookmark `json:"bookmarks,omitempty"`
 	Subfolders []Folder   `json:"subfolders,omitempty"`
+}
+
+func (f *Folder) flatten() *Folder {
+	flattened := &Folder{
+		CreatedAt:   f.CreatedAt,
+		UpdatedAt:   f.UpdatedAt,
+		Description: f.Description,
+		Name:        f.Name,
+		Attributes:  f.Attributes,
+	}
+
+	flattened.Bookmarks = append(flattened.Bookmarks, f.Bookmarks...)
+
+	for _, subfolder := range f.Subfolders {
+		flattenedSubfolder := subfolder.flatten()
+		flattened.Bookmarks = append(flattened.Bookmarks, flattenedSubfolder.Bookmarks...)
+	}
+
+	return flattened
 }
 
 // A Bookmark represents a Netscape Bookmark.

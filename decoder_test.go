@@ -249,39 +249,6 @@ func TestDecodeFolder(t *testing.T) {
 	}
 }
 
-func assertFoldersEqual(t *testing.T, got Folder, want Folder) {
-	t.Helper()
-
-	assertDatesEqual(t, "creation", got.CreatedAt, want.CreatedAt)
-	assertDatesEqual(t, "update", got.UpdatedAt, want.UpdatedAt)
-
-	if got.Description != want.Description {
-		t.Errorf("want description %q, got %q", want.Description, got.Description)
-	}
-
-	if got.Name != want.Name {
-		t.Errorf("want name %q, got %q", want.Name, got.Name)
-	}
-
-	assertAttributesEqual(t, got.Attributes, want.Attributes)
-
-	if len(got.Bookmarks) != len(want.Bookmarks) {
-		t.Fatalf("want %d bookmarks, got %d", len(want.Bookmarks), len(got.Bookmarks))
-	}
-
-	for index, wantBookmark := range want.Bookmarks {
-		assertBookmarksEqual(t, got.Bookmarks[index], wantBookmark)
-	}
-
-	if len(got.Subfolders) != len(want.Subfolders) {
-		t.Fatalf("want %d subfolders, got %d", len(want.Subfolders), len(got.Subfolders))
-	}
-
-	for index, wantSubfolder := range want.Subfolders {
-		assertFoldersEqual(t, got.Subfolders[index], wantSubfolder)
-	}
-}
-
 func TestDecodeBookmark(t *testing.T) {
 	bookmarkCreatedAt := time.Date(2022, time.March, 1, 17, 11, 13, 0, time.UTC)
 	bookmarkUpdatedAt := time.Date(2022, time.March, 1, 22, 9, 46, 0, time.UTC)
@@ -404,39 +371,6 @@ func TestDecodeBookmark(t *testing.T) {
 	}
 }
 
-func assertBookmarksEqual(t *testing.T, got Bookmark, want Bookmark) {
-	assertDatesEqual(t, "creation", got.CreatedAt, want.CreatedAt)
-	assertDatesEqual(t, "update", got.UpdatedAt, want.UpdatedAt)
-
-	if got.Title != want.Title {
-		t.Errorf("want title %q, got %q", want.Title, got.Title)
-	}
-
-	if got.URL != want.URL {
-		t.Errorf("want URL string %q, got %q", want.URL, got.URL)
-	}
-
-	if got.Description != want.Description {
-		t.Errorf("want description %q, got %q", want.Description, got.Description)
-	}
-
-	if got.Private != want.Private {
-		t.Errorf("want private %t, got %t", want.Private, got.Private)
-	}
-
-	if len(got.Tags) != len(want.Tags) {
-		t.Fatalf("want %d tags, got %d", len(want.Tags), len(got.Tags))
-	}
-
-	for index, wantTag := range want.Tags {
-		if got.Tags[index] != wantTag {
-			t.Errorf("want tag %d value %q, got %q", index, wantTag, got.Tags[index])
-		}
-	}
-
-	assertAttributesEqual(t, got.Attributes, want.Attributes)
-}
-
 func TestDecodeDateTime(t *testing.T) {
 	cases := []struct {
 		tname string
@@ -504,39 +438,5 @@ func TestDecodeDateTime(t *testing.T) {
 				t.Errorf("want date/time %q, got %q", tc.want, got)
 			}
 		})
-	}
-}
-
-func assertAttributesEqual(t *testing.T, got map[string]string, want map[string]string) {
-	t.Helper()
-
-	if len(got) != len(want) {
-		t.Fatalf("want %d attributes, got %d", len(want), len(got))
-	}
-
-	for attr, wantValue := range want {
-		if got[attr] != wantValue {
-			t.Errorf("want attribute %q value %q, got %q", attr, wantValue, got[attr])
-		}
-	}
-}
-
-func assertDatesEqual(t *testing.T, name string, got *time.Time, want *time.Time) {
-	t.Helper()
-
-	if want == nil {
-		if got != nil {
-			t.Errorf("want %s datetime nil, got %q", name, got.String())
-		}
-		return
-	}
-
-	if got == nil {
-		t.Errorf("want %s datetime %q, got nil", name, want.String())
-		return
-	}
-
-	if got.String() != want.String() {
-		t.Errorf("want %s date %q, got %q", name, want.String(), got.String())
 	}
 }
