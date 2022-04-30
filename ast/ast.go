@@ -2,27 +2,27 @@
 // Bookmark files.
 package ast
 
-// A File Node represents a Netscape Bookmark file.
-type File struct {
+// A FileNode represents a Netscape Bookmark file.
+type FileNode struct {
 	Title string
-	Root  Folder
+	Root  FolderNode
 }
 
-// A Folder Node represents a bookmark (sub-)folder that may contain Bookmarks
+// A FolderNode represents a bookmark (sub-)folder that may contain Bookmarks
 // and child Folders.
-type Folder struct {
-	Parent *Folder
+type FolderNode struct {
+	Parent *FolderNode
 
 	Name        string
 	Description string
 	Attributes  map[string]string
 
-	Bookmarks  []Bookmark
-	Subfolders []Folder
+	Bookmarks  []BookmarkNode
+	Subfolders []FolderNode
 }
 
-// A Bookmark Node represents a Netscape bookmark.
-type Bookmark struct {
+// A BookmarkNode represents a Netscape bookmark.
+type BookmarkNode struct {
 	Href        string
 	Title       string
 	Description string

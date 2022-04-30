@@ -15,7 +15,7 @@ func TestParse(t *testing.T) {
 	cases := []struct {
 		tname   string
 		input   string
-		want    ast.File
+		want    ast.FileNode
 		wantErr error
 	}{
 		// nominal cases
@@ -36,11 +36,11 @@ func TestParse(t *testing.T) {
 <DD>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -66,9 +66,9 @@ func TestParse(t *testing.T) {
 <DL><p>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
 				},
 			},
@@ -82,11 +82,11 @@ func TestParse(t *testing.T) {
     <DT><A HREF="https://domain.tld" ADD_DATE="151637044" PRIVATE="1" TAGS="test tags">Test Domain</A>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -114,11 +114,11 @@ func TestParse(t *testing.T) {
 <DD>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -151,11 +151,11 @@ func TestParse(t *testing.T) {
 - item 3
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Description: "Description:\n\n- item 1\n    - item 1.1\n    - item 1.2\n- item 2\n- item 3",
 							Href:        "https://domain.tld",
@@ -176,11 +176,11 @@ func TestParse(t *testing.T) {
 <a href="http://localhost:8080"><img src="http://localhost:8080/splash.png"/></a>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Description: `Markup:
 <a href="http://localhost:8080"><img src="http://localhost:8080/splash.png"/></a>`,
@@ -208,14 +208,14 @@ func TestParse(t *testing.T) {
 	</DL><p>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Level 0",
-					Subfolders: []ast.Folder{
+					Subfolders: []ast.FolderNode{
 						{
 							Name: "Level 1A",
-							Subfolders: []ast.Folder{
+							Subfolders: []ast.FolderNode{
 								{Name: "Level 2A"},
 							},
 						},
@@ -245,24 +245,24 @@ func TestParse(t *testing.T) {
 	</DL><p>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Level 0",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{Href: "https://l0.domain.tld", Title: "Level 0"},
 						{Href: "https://l0.domain.tld", Title: "Level 0"},
 					},
-					Subfolders: []ast.Folder{
+					Subfolders: []ast.FolderNode{
 						{
 							Name: "Level 1A",
-							Bookmarks: []ast.Bookmark{
+							Bookmarks: []ast.BookmarkNode{
 								{Href: "https://l1a.domain.tld", Title: "Level 1A"},
 							},
-							Subfolders: []ast.Folder{
+							Subfolders: []ast.FolderNode{
 								{
 									Name: "Level 2A",
-									Bookmarks: []ast.Bookmark{
+									Bookmarks: []ast.BookmarkNode{
 										{Href: "https://l2a.domain.tld", Title: "Level 2A"},
 									},
 								},
@@ -285,11 +285,11 @@ func TestParse(t *testing.T) {
 	</DL><p>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Subfolders: []ast.Folder{
+					Subfolders: []ast.FolderNode{
 						{
 							Name:        "Personal toolbar",
 							Description: "Add bookmarks to this folder to see them displayed on the Bookmarks Toolbar",
@@ -316,15 +316,15 @@ func TestParse(t *testing.T) {
     </DL><p>
 </DL><p>
 `,
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Level 0",
-					Subfolders: []ast.Folder{
+					Subfolders: []ast.FolderNode{
 						{
 							Name:        "Level 1",
 							Description: "Folder with description",
-							Bookmarks: []ast.Bookmark{
+							Bookmarks: []ast.BookmarkNode{
 								{
 									Href:  "https://domain.tld",
 									Title: "Test Domain",
@@ -399,16 +399,16 @@ func TestParseFile(t *testing.T) {
 	cases := []struct {
 		tname         string
 		inputFilename string
-		want          ast.File
+		want          ast.FileNode
 	}{
 		{
 			tname:         "Netscape (basic)",
 			inputFilename: "netscape_basic.htm",
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Description: "Super-secret stuff you're not supposed to know about",
 							Href:        "https://private.tld",
@@ -436,11 +436,11 @@ func TestParseFile(t *testing.T) {
 		{
 			tname:         "Netscape (extended markup)",
 			inputFilename: "netscape_extended.htm",
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "My local links",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Shaarli export of all bookmarks on Sat, 06 Jun 20 15:50:59 +0200",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Description: `For 10 years, a rogue fishing vessel and its crew plundered the world’s oceans, escaping repeated attempts of capture. Then a dramatic pursuit finally netted the one that got away.
 <a href="http://localhost.localdomain:8083/Shaarli/?JVvqCA"><img src="http://localhost.localdomain:8083/Shaarli/cache/thumb/290ccda0deea6083ee613d358446103e/c975558ad43acdbd982ffafd8c01163d6c9ec5ca125901.jpg"/></a>`,
@@ -460,11 +460,11 @@ func TestParseFile(t *testing.T) {
 		{
 			tname:         "Netscape (multiline descriptions)",
 			inputFilename: "netscape_multiline.htm",
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Description: "List:\n- item1\n- item2\n- item3",
 							Href:        "http://multi.li.ne/1",
@@ -503,11 +503,11 @@ func TestParseFile(t *testing.T) {
 		{
 			tname:         "Netscape (nested)",
 			inputFilename: "netscape_nested.htm",
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name: "Bookmarks",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Href:  "http://nest.ed/1",
 							Title: "Nested 1",
@@ -527,14 +527,14 @@ func TestParseFile(t *testing.T) {
 							},
 						},
 					},
-					Subfolders: []ast.Folder{
+					Subfolders: []ast.FolderNode{
 						{
 							Name: "Folder1, the first,folder to encounter",
 							Attributes: map[string]string{
 								"ADD_DATE":      "1456433722",
 								"LAST_MODIFIED": "1456433739",
 							},
-							Bookmarks: []ast.Bookmark{
+							Bookmarks: []ast.BookmarkNode{
 								{
 									Href:  "http://nest.ed/1-1",
 									Title: "Nested 1-1",
@@ -561,7 +561,7 @@ func TestParseFile(t *testing.T) {
 							Attributes: map[string]string{
 								"ADD_DATE": "1456433722",
 							},
-							Bookmarks: []ast.Bookmark{
+							Bookmarks: []ast.BookmarkNode{
 								{
 									Description: "First link of the second section",
 									Href:        "http://nest.ed/2-1",
@@ -584,10 +584,10 @@ func TestParseFile(t *testing.T) {
 						},
 						{
 							Name: "Folder3",
-							Subfolders: []ast.Folder{
+							Subfolders: []ast.FolderNode{
 								{
 									Name: "Folder3-1",
-									Bookmarks: []ast.Bookmark{
+									Bookmarks: []ast.BookmarkNode{
 										{
 											Href:  "http://nest.ed/3-1",
 											Title: "Nested 3-1",
@@ -616,18 +616,18 @@ func TestParseFile(t *testing.T) {
 		{
 			tname:         "Safari (folded)",
 			inputFilename: "safari_folded.htm",
-			want: ast.File{
+			want: ast.FileNode{
 				Title: "Signets",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name:      "Signets",
-					Bookmarks: []ast.Bookmark{},
-					Subfolders: []ast.Folder{
+					Bookmarks: []ast.BookmarkNode{},
+					Subfolders: []ast.FolderNode{
 						{
 							Name: "Favoris",
 							Attributes: map[string]string{
 								"FOLDED": "FOLDED",
 							},
-							Bookmarks: []ast.Bookmark{
+							Bookmarks: []ast.BookmarkNode{
 								{
 									Href:  "https://github.com/",
 									Title: "GitHub",
@@ -645,7 +645,7 @@ func TestParseFile(t *testing.T) {
 							Attributes: map[string]string{
 								"FOLDED": "FOLDED",
 							},
-							Bookmarks: []ast.Bookmark{
+							Bookmarks: []ast.BookmarkNode{
 								{
 									Href:  "https://github.com/golang/go",
 									Title: "golang/go: The Go programming language",
@@ -657,13 +657,13 @@ func TestParseFile(t *testing.T) {
 							Attributes: map[string]string{
 								"FOLDED": "FOLDED",
 							},
-							Subfolders: []ast.Folder{
+							Subfolders: []ast.FolderNode{
 								{
 									Name: "Wiki",
 									Attributes: map[string]string{
 										"FOLDED": "FOLDED",
 									},
-									Bookmarks: []ast.Bookmark{
+									Bookmarks: []ast.BookmarkNode{
 										{
 											Href:  "https://en.wikipedia.org/wiki/Main_Page",
 											Title: "Wikipedia, the free encyclopedia",
@@ -700,7 +700,7 @@ func TestParseFile(t *testing.T) {
 		})
 	}
 }
-func assertFoldersEqual(t *testing.T, got ast.Folder, want ast.Folder) {
+func assertFoldersEqual(t *testing.T, got ast.FolderNode, want ast.FolderNode) {
 	t.Helper()
 
 	if got.Name != want.Name {

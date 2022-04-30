@@ -23,7 +23,7 @@ var (
 
 // Parse reads a Netscape Bookmark document and processes it token by token to
 // build and return the corresponding AST.
-func Parse(readseeker io.ReadSeeker) (*ast.File, error) {
+func Parse(readseeker io.ReadSeeker) (*ast.FileNode, error) {
 	p := newParser(readseeker)
 	return p.parse()
 }
@@ -33,14 +33,14 @@ type parser struct {
 	decoder     *xml.Decoder
 	tokenOffset int64
 
-	file            *ast.File
-	currentFolder   *ast.Folder
-	currentBookmark *ast.Bookmark
+	file            *ast.FileNode
+	currentFolder   *ast.FolderNode
+	currentBookmark *ast.BookmarkNode
 }
 
 func newParser(readseeker io.ReadSeeker) *parser {
 	decoder := newDecoder(readseeker)
-	file := &ast.File{}
+	file := &ast.FileNode{}
 
 	return &parser{
 		readseeker: readseeker,
@@ -49,9 +49,9 @@ func newParser(readseeker io.ReadSeeker) *parser {
 	}
 }
 
-func (p *parser) parse() (*ast.File, error) {
+func (p *parser) parse() (*ast.FileNode, error) {
 	if err := p.verifyDoctype(); err != nil {
-		return &ast.File{}, err
+		return &ast.FileNode{}, err
 	}
 
 	for {
@@ -65,19 +65,19 @@ func (p *parser) parse() (*ast.File, error) {
 			switch tokType.Name.Local {
 			case "TITLE", "Title":
 				if err := p.parseTitle(&tokType); err != nil {
-					return &ast.File{}, err
+					return &ast.FileNode{}, err
 				}
 			case "H1":
 				folder, err := p.parseFolder(&tokType)
 				if err != nil {
-					return &ast.File{}, err
+					return &ast.FileNode{}, err
 				}
 
 				p.file.Root = folder
 				p.currentFolder = &p.file.Root
 			case "DL", "DT":
 				if err := p.parseBookmarks(&tokType); err != nil {
-					return &ast.File{}, err
+					return &ast.FileNode{}, err
 				}
 			}
 		}
@@ -101,18 +101,18 @@ func (p *parser) parseTitle(start *xml.StartElement) error {
 	return nil
 }
 
-func (p *parser) parseFolder(start *xml.StartElement) (ast.Folder, error) {
+func (p *parser) parseFolder(start *xml.StartElement) (ast.FolderNode, error) {
 	var elt struct {
 		Name string `xml:",chardata"`
 	}
 
 	if err := p.decoder.DecodeElement(&elt, start); err != nil {
-		return ast.Folder{}, wrapWithError("failed to parse folder", p.tokenOffset, err)
+		return ast.FolderNode{}, wrapWithError("failed to parse folder", p.tokenOffset, err)
 	}
 
 	p.tokenOffset = p.decoder.InputOffset()
 
-	folder := ast.Folder{
+	folder := ast.FolderNode{
 		Name:       elt.Name,
 		Attributes: map[string]string{},
 	}
@@ -177,18 +177,18 @@ func (p *parser) parseBookmarks(start *xml.StartElement) error {
 	return nil
 }
 
-func (p *parser) parseBookmark(start *xml.StartElement) (ast.Bookmark, error) {
+func (p *parser) parseBookmark(start *xml.StartElement) (ast.BookmarkNode, error) {
 	var link struct {
 		Title string `xml:",chardata"`
 	}
 
 	if err := p.decoder.DecodeElement(&link, start); err != nil {
-		return ast.Bookmark{}, wrapWithError("failed to parse bookmark", p.tokenOffset, err)
+		return ast.BookmarkNode{}, wrapWithError("failed to parse bookmark", p.tokenOffset, err)
 	}
 
 	p.tokenOffset = p.decoder.InputOffset()
 
-	bookmark := ast.Bookmark{
+	bookmark := ast.BookmarkNode{
 		Title:      link.Title,
 		Attributes: map[string]string{},
 	}

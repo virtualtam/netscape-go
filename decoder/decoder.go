@@ -13,7 +13,7 @@ import (
 )
 
 // Decode walks a Netscape Bookmark AST and returns the corresponding document.
-func Decode(f ast.File) (*types.Document, error) {
+func Decode(f ast.FileNode) (*types.Document, error) {
 	var d Decoder
 	return d.decodeFile(f)
 }
@@ -37,7 +37,7 @@ func NewDecoder() *Decoder {
 	}
 }
 
-func (d *Decoder) decodeFile(f ast.File) (*types.Document, error) {
+func (d *Decoder) decodeFile(f ast.FileNode) (*types.Document, error) {
 	document := types.Document{
 		Title: f.Title,
 	}
@@ -51,7 +51,7 @@ func (d *Decoder) decodeFile(f ast.File) (*types.Document, error) {
 	return &document, nil
 }
 
-func (d *Decoder) decodeFolder(f ast.Folder) (types.Folder, error) {
+func (d *Decoder) decodeFolder(f ast.FolderNode) (types.Folder, error) {
 	folder := types.Folder{
 		Name:        f.Name,
 		Description: f.Description,
@@ -98,7 +98,7 @@ func (d *Decoder) decodeFolder(f ast.Folder) (types.Folder, error) {
 	return folder, nil
 }
 
-func (d Decoder) decodeBookmark(b ast.Bookmark) (types.Bookmark, error) {
+func (d Decoder) decodeBookmark(b ast.BookmarkNode) (types.Bookmark, error) {
 	bookmark := types.Bookmark{
 		Description: b.Description,
 		Href:        b.Href,

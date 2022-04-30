@@ -11,7 +11,7 @@ import (
 func TestDecodeFile(t *testing.T) {
 	cases := []struct {
 		tname string
-		file  ast.File
+		file  ast.FileNode
 		want  types.Document
 	}{
 		{
@@ -19,12 +19,12 @@ func TestDecodeFile(t *testing.T) {
 		},
 		{
 			tname: "flat document",
-			file: ast.File{
+			file: ast.FileNode{
 				Title: "Bookmarks",
-				Root: ast.Folder{
+				Root: ast.FolderNode{
 					Name:        "Test Folder",
 					Description: "Add bookmarks to this folder",
-					Bookmarks: []ast.Bookmark{
+					Bookmarks: []ast.BookmarkNode{
 						{
 							Href:  "https://domain.tld",
 							Title: "Test Domain",
@@ -83,12 +83,12 @@ func TestDecodeFolder(t *testing.T) {
 
 	cases := []struct {
 		tname string
-		input ast.Folder
+		input ast.FolderNode
 		want  types.Folder
 	}{
 		{
 			tname: "empty folder",
-			input: ast.Folder{
+			input: ast.FolderNode{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 			},
@@ -99,7 +99,7 @@ func TestDecodeFolder(t *testing.T) {
 		},
 		{
 			tname: "empty folder with creation date",
-			input: ast.Folder{
+			input: ast.FolderNode{
 				Name: "Test Folder",
 				Attributes: map[string]string{
 					"ADD_DATE": "1646154673",
@@ -112,7 +112,7 @@ func TestDecodeFolder(t *testing.T) {
 		},
 		{
 			tname: "empty folder with creation and update dates, and extra attributes",
-			input: ast.Folder{
+			input: ast.FolderNode{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 				Attributes: map[string]string{
@@ -133,10 +133,10 @@ func TestDecodeFolder(t *testing.T) {
 		},
 		{
 			tname: "folder with bookmarks",
-			input: ast.Folder{
+			input: ast.FolderNode{
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
-				Bookmarks: []ast.Bookmark{
+				Bookmarks: []ast.BookmarkNode{
 					{
 						Href:  "https://domain.tld",
 						Title: "Test Domain",
@@ -166,10 +166,10 @@ func TestDecodeFolder(t *testing.T) {
 		},
 		{
 			tname: "folder with sub-folders and bookmarks",
-			input: ast.Folder{
+			input: ast.FolderNode{
 				Name:        "Bookmarks",
 				Description: "Root Folder",
-				Bookmarks: []ast.Bookmark{
+				Bookmarks: []ast.BookmarkNode{
 					{
 						Href:  "https://domain.tld",
 						Title: "Test Domain",
@@ -180,13 +180,13 @@ func TestDecodeFolder(t *testing.T) {
 						Title:       "Test Domain II",
 					},
 				},
-				Subfolders: []ast.Folder{
+				Subfolders: []ast.FolderNode{
 					{
 						Name: "Empty",
 					},
 					{
 						Name: "Personal Toolbar",
-						Bookmarks: []ast.Bookmark{
+						Bookmarks: []ast.BookmarkNode{
 							{
 								Href:  "https://personal.tld",
 								Title: "Personal Domain",
@@ -291,12 +291,12 @@ func TestDecodeBookmark(t *testing.T) {
 
 	cases := []struct {
 		tname string
-		input ast.Bookmark
+		input ast.BookmarkNode
 		want  types.Bookmark
 	}{
 		{
 			tname: "bookmark with mandatory information only",
-			input: ast.Bookmark{
+			input: ast.BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 			},
@@ -307,7 +307,7 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "bookmark with multi-line description",
-			input: ast.Bookmark{
+			input: ast.BookmarkNode{
 				Description: "Nested lists:\n- list1\n  - item1.1\n  - item1.2\n  - item1.3\n- list2\n  - item2.1",
 				Href:        "https://domain.tld",
 				Title:       "Test Domain",
@@ -320,7 +320,7 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "bookmark with creation and update date",
-			input: ast.Bookmark{
+			input: ast.BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
@@ -337,7 +337,7 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "private bookmark",
-			input: ast.Bookmark{
+			input: ast.BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
@@ -352,7 +352,7 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "bookmark with comma-separated tags and extra whitespace",
-			input: ast.Bookmark{
+			input: ast.BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
@@ -371,7 +371,7 @@ func TestDecodeBookmark(t *testing.T) {
 		},
 		{
 			tname: "bookmark with extra attributes",
-			input: ast.Bookmark{
+			input: ast.BookmarkNode{
 				Href:  "https://domain.tld",
 				Title: "Test Domain",
 				Attributes: map[string]string{
