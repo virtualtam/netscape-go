@@ -17,9 +17,50 @@ const (
 )
 
 var (
+	ErrDoctypeMissing error = errors.New("missing DOCTYPE")
+	ErrDoctypeInvalid error = errors.New("invalid DOCTYPE")
+)
+
+var (
 	// Byte order mark
 	utf8bom = []byte{0xef, 0xbb, 0xbf}
 )
+
+// A ParseError is returned when we fail to parse a Netscape Bookmark token or XML
+// element.
+type ParseError struct {
+	Msg string
+	Pos int64
+	Err error
+}
+
+// Error returns the string representation for this error.
+func (e *ParseError) Error() string {
+	return fmt.Sprintf("%s at position %d: %s", e.Msg, e.Pos, e.Err)
+}
+
+// Is compares this Error with a target error to satisfy an equality check.
+func (e *ParseError) Is(target error) bool {
+	t, ok := target.(*ParseError)
+	if !ok {
+		return false
+	}
+
+	return e.Msg == t.Msg && e.Pos == t.Pos
+}
+
+// Unwrap returns the inner error wrapped by this Error.
+func (e *ParseError) Unwrap() error {
+	return e.Err
+}
+
+func wrapWitParseError(msg string, pos int64, inner error) error {
+	return &ParseError{
+		Msg: msg,
+		Pos: pos,
+		Err: inner,
+	}
+}
 
 // Parse reads a Netscape Bookmark document and processes it token by token to
 // build and return the corresponding AST.
@@ -38,8 +79,21 @@ type parser struct {
 	currentBookmark *ast.BookmarkNode
 }
 
+// newXMLDecoder initializes and returns a xml.Decoder with strict mode disabled,
+// to handle Netscape Bookmark format quirks.
+func newXMLDecoder(reader io.Reader) *xml.Decoder {
+	decoder := xml.NewDecoder(reader)
+
+	decoder.Strict = false
+	decoder.AutoClose = []string{
+		"p",
+	}
+
+	return decoder
+}
+
 func newParser(readseeker io.ReadSeeker) *parser {
-	decoder := newDecoder(readseeker)
+	decoder := newXMLDecoder(readseeker)
 	file := &ast.FileNode{}
 
 	return &parser{
@@ -92,7 +146,7 @@ func (p *parser) parseTitle(start *xml.StartElement) error {
 	}
 
 	if err := p.decoder.DecodeElement(&title, start); err != nil {
-		return wrapWithError("failed to parse title", p.tokenOffset, err)
+		return wrapWitParseError("failed to parse title", p.tokenOffset, err)
 	}
 
 	p.tokenOffset = p.decoder.InputOffset()
@@ -107,7 +161,7 @@ func (p *parser) parseFolder(start *xml.StartElement) (ast.FolderNode, error) {
 	}
 
 	if err := p.decoder.DecodeElement(&elt, start); err != nil {
-		return ast.FolderNode{}, wrapWithError("failed to parse folder", p.tokenOffset, err)
+		return ast.FolderNode{}, wrapWitParseError("failed to parse folder", p.tokenOffset, err)
 	}
 
 	p.tokenOffset = p.decoder.InputOffset()
@@ -183,7 +237,7 @@ func (p *parser) parseBookmark(start *xml.StartElement) (ast.BookmarkNode, error
 	}
 
 	if err := p.decoder.DecodeElement(&link, start); err != nil {
-		return ast.BookmarkNode{}, wrapWithError("failed to parse bookmark", p.tokenOffset, err)
+		return ast.BookmarkNode{}, wrapWitParseError("failed to parse bookmark", p.tokenOffset, err)
 	}
 
 	p.tokenOffset = p.decoder.InputOffset()
@@ -224,7 +278,7 @@ loop:
 	for {
 		tok, err := p.decoder.Token()
 		if err != nil {
-			return "", wrapWithError("failed to parse description", p.tokenOffset, err)
+			return "", wrapWitParseError("failed to parse description", p.tokenOffset, err)
 		}
 
 		p.tokenOffset = p.decoder.InputOffset()
@@ -293,11 +347,11 @@ func (p *parser) verifyDoctype() error {
 			if bytes.Equal(tokType, utf8bom) {
 				continue
 			}
-			return wrapWithError("unexpected character data", p.tokenOffset, ErrDoctypeInvalid)
+			return wrapWitParseError("unexpected character data", p.tokenOffset, ErrDoctypeInvalid)
 
 		case xml.Directive:
 			if string(tokType) != fmt.Sprintf("DOCTYPE %s", NetscapeBookmarkDoctype) {
-				return wrapWithError(fmt.Sprintf("unknown DOCTYPE %s", string(tokType)), p.tokenOffset, ErrDoctypeInvalid)
+				return wrapWitParseError(fmt.Sprintf("unknown DOCTYPE %s", string(tokType)), p.tokenOffset, ErrDoctypeInvalid)
 			}
 			return nil
 
