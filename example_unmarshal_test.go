@@ -15,8 +15,8 @@ func ExampleUnmarshal() {
 <DL><p>
     <DT><H3>Linux Distributions</H3>
 	<DL><p>
-		<DT><A HREF="https://archlinux.org">Arch Linux</A>
-	    <DT><A HREF="https://debian.org">Debian</A>
+		<DT><A HREF="https://archlinux.org" ADD_DATE="1654077848">Arch Linux</A>
+	    <DT><A HREF="https://debian.org" ADD_DATE="1653057612" LAST_MODIFIED="1653058043">Debian</A>
 	</DL><p>
     <DT><H3>Programming Languages</H3>
 	<DL><p>
@@ -55,11 +55,15 @@ func ExampleUnmarshal() {
 	//         "name": "Linux Distributions",
 	//         "bookmarks": [
 	//           {
+	//             "created_at": "2022-06-01T10:04:08Z",
+	//             "updated_at": "2022-06-01T10:04:08Z",
 	//             "title": "Arch Linux",
 	//             "url": "https://archlinux.org",
 	//             "private": false
 	//           },
 	//           {
+	//             "created_at": "2022-05-20T14:40:12Z",
+	//             "updated_at": "2022-05-20T14:47:23Z",
 	//             "title": "Debian",
 	//             "url": "https://debian.org",
 	//             "private": false
