@@ -68,6 +68,9 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 				return Folder{}, err
 			}
 			folder.CreatedAt = createdAt
+			if folder.UpdatedAt.IsZero() {
+				folder.UpdatedAt = createdAt
+			}
 		case updatedAtAttr:
 			updatedAt, err := d.decodeDate(value)
 			if err != nil {
@@ -116,6 +119,9 @@ func (d Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
 				return Bookmark{}, err
 			}
 			bookmark.CreatedAt = createdAt
+			if bookmark.UpdatedAt.IsZero() {
+				bookmark.UpdatedAt = createdAt
+			}
 		case updatedAtAttr:
 			updatedAt, err := d.decodeDate(value)
 			if err != nil {

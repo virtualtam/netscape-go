@@ -104,6 +104,7 @@ func TestDecodeFolder(t *testing.T) {
 			},
 			want: Folder{
 				CreatedAt: folderCreatedAt,
+				UpdatedAt: folderCreatedAt,
 				Name:      "Test Folder",
 			},
 		},
@@ -280,6 +281,22 @@ func TestDecodeBookmark(t *testing.T) {
 				Title:       "Test Domain",
 				URL:         "https://domain.tld",
 				Description: "Nested lists:\n- list1\n  - item1.1\n  - item1.2\n  - item1.3\n- list2\n  - item2.1",
+			},
+		},
+		{
+			tname: "bookmark with creation date",
+			input: BookmarkNode{
+				Href:  "https://domain.tld",
+				Title: "Test Domain",
+				Attributes: map[string]string{
+					"ADD_DATE": "1646154673",
+				},
+			},
+			want: Bookmark{
+				CreatedAt: bookmarkCreatedAt,
+				UpdatedAt: bookmarkCreatedAt,
+				Title:     "Test Domain",
+				URL:       "https://domain.tld",
 			},
 		},
 		{
