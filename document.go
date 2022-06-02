@@ -1,6 +1,7 @@
 package netscape
 
 import (
+	"encoding/json"
 	"time"
 )
 
@@ -23,16 +24,48 @@ func (d *Document) Flatten() *Document {
 
 // A Folder represents a folder containing Netscape Bookmarks and child Folders.
 type Folder struct {
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 
-	Description string `json:"description,omitempty"`
-	Name        string `json:"name"`
+	Description string
+	Name        string
 
-	Attributes map[string]string `json:"attributes,omitempty"`
+	Attributes map[string]string
 
-	Bookmarks  []Bookmark `json:"bookmarks,omitempty"`
-	Subfolders []Folder   `json:"subfolders,omitempty"`
+	Bookmarks  []Bookmark
+	Subfolders []Folder
+}
+
+func (f *Folder) MarshalJSON() ([]byte, error) {
+	type folder struct {
+		CreatedAt *time.Time `json:"created_at,omitempty"`
+		UpdatedAt *time.Time `json:"updated_at,omitempty"`
+
+		Description string `json:"description,omitempty"`
+		Name        string `json:"name"`
+
+		Attributes map[string]string `json:"attributes,omitempty"`
+
+		Bookmarks  []Bookmark `json:"bookmarks,omitempty"`
+		Subfolders []Folder   `json:"subfolders,omitempty"`
+	}
+
+	jsonFolder := folder{
+		Description: f.Description,
+		Name:        f.Name,
+		Attributes:  f.Attributes,
+		Bookmarks:   f.Bookmarks,
+		Subfolders:  f.Subfolders,
+	}
+
+	if !f.CreatedAt.IsZero() {
+		jsonFolder.CreatedAt = &f.CreatedAt
+	}
+	if !f.UpdatedAt.IsZero() {
+		jsonFolder.UpdatedAt = &f.UpdatedAt
+	}
+
+	return json.Marshal(&jsonFolder)
 }
 
 func (f *Folder) flatten() *Folder {
@@ -56,15 +89,49 @@ func (f *Folder) flatten() *Folder {
 
 // A Bookmark represents a Netscape Bookmark.
 type Bookmark struct {
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 
-	Title string `json:"title"`
-	URL   string `json:"url"`
+	Title string
+	URL   string
 
-	Description string   `json:"description,omitempty"`
-	Private     bool     `json:"private"`
-	Tags        []string `json:"tags,omitempty"`
+	Description string
+	Private     bool
+	Tags        []string
 
-	Attributes map[string]string `json:"attributes,omitempty"`
+	Attributes map[string]string
+}
+
+func (b *Bookmark) MarshalJSON() ([]byte, error) {
+	type bookmark struct {
+		CreatedAt *time.Time `json:"created_at,omitempty"`
+		UpdatedAt *time.Time `json:"updated_at,omitempty"`
+
+		Title string `json:"title"`
+		URL   string `json:"url"`
+
+		Description string   `json:"description,omitempty"`
+		Private     bool     `json:"private"`
+		Tags        []string `json:"tags,omitempty"`
+
+		Attributes map[string]string `json:"attributes,omitempty"`
+	}
+
+	jsonBookmark := bookmark{
+		Title:       b.Title,
+		URL:         b.URL,
+		Description: b.Description,
+		Private:     b.Private,
+		Tags:        b.Tags,
+		Attributes:  b.Attributes,
+	}
+
+	if !b.CreatedAt.IsZero() {
+		jsonBookmark.CreatedAt = &b.CreatedAt
+	}
+	if !b.UpdatedAt.IsZero() {
+		jsonBookmark.UpdatedAt = &b.UpdatedAt
+	}
+
+	return json.Marshal(&jsonBookmark)
 }
