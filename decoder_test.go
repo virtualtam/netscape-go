@@ -103,7 +103,7 @@ func TestDecodeFolder(t *testing.T) {
 				},
 			},
 			want: Folder{
-				CreatedAt: &folderCreatedAt,
+				CreatedAt: folderCreatedAt,
 				Name:      "Test Folder",
 			},
 		},
@@ -119,8 +119,8 @@ func TestDecodeFolder(t *testing.T) {
 				},
 			},
 			want: Folder{
-				CreatedAt:   &folderCreatedAt,
-				UpdatedAt:   &folderUpdatedAt,
+				CreatedAt:   folderCreatedAt,
+				UpdatedAt:   folderUpdatedAt,
 				Name:        "Test Folder",
 				Description: "Add bookmarks to this folder",
 				Attributes: map[string]string{
@@ -293,8 +293,8 @@ func TestDecodeBookmark(t *testing.T) {
 				},
 			},
 			want: Bookmark{
-				CreatedAt: &bookmarkCreatedAt,
-				UpdatedAt: &bookmarkUpdatedAt,
+				CreatedAt: bookmarkCreatedAt,
+				UpdatedAt: bookmarkUpdatedAt,
 				Title:     "Test Domain",
 				URL:       "https://domain.tld",
 			},

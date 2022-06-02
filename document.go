@@ -23,8 +23,8 @@ func (d *Document) Flatten() *Document {
 
 // A Folder represents a folder containing Netscape Bookmarks and child Folders.
 type Folder struct {
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 
 	Description string `json:"description,omitempty"`
 	Name        string `json:"name"`
@@ -56,8 +56,8 @@ func (f *Folder) flatten() *Folder {
 
 // A Bookmark represents a Netscape Bookmark.
 type Bookmark struct {
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 
 	Title string `json:"title"`
 	URL   string `json:"url"`

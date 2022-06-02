@@ -67,13 +67,13 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 			if err != nil {
 				return Folder{}, err
 			}
-			folder.CreatedAt = &createdAt
+			folder.CreatedAt = createdAt
 		case updatedAtAttr:
 			updatedAt, err := d.decodeDate(value)
 			if err != nil {
 				return Folder{}, err
 			}
-			folder.UpdatedAt = &updatedAt
+			folder.UpdatedAt = updatedAt
 		default:
 			folder.Attributes[attr] = value
 		}
@@ -115,13 +115,13 @@ func (d Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
 			if err != nil {
 				return Bookmark{}, err
 			}
-			bookmark.CreatedAt = &createdAt
+			bookmark.CreatedAt = createdAt
 		case updatedAtAttr:
 			updatedAt, err := d.decodeDate(value)
 			if err != nil {
 				return Bookmark{}, err
 			}
-			bookmark.UpdatedAt = &updatedAt
+			bookmark.UpdatedAt = updatedAt
 		case privateAttr:
 			if value == "1" {
 				bookmark.Private = true

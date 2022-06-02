@@ -72,18 +72,18 @@ func TestMarshal(t *testing.T) {
 						{
 							Name:        "Favorites",
 							Description: "Add bookmarks here",
-							CreatedAt:   &folderCreatedAt,
-							UpdatedAt:   &folderUpdatedAt,
+							CreatedAt:   folderCreatedAt,
+							UpdatedAt:   folderUpdatedAt,
 							Bookmarks: []Bookmark{
 								{
-									CreatedAt: &bookmarkCreatedAt,
+									CreatedAt: bookmarkCreatedAt,
 									URL:       "https://domain.tld",
 									Title:     "Test Domain",
 									Private:   true,
 								},
 								{
-									CreatedAt:   &bookmarkCreatedAt,
-									UpdatedAt:   &bookmarkUpdatedAt,
+									CreatedAt:   bookmarkCreatedAt,
+									UpdatedAt:   bookmarkUpdatedAt,
 									Description: "Second test",
 									URL:         "https://test.domain.tld",
 									Title:       "Test Domain II",

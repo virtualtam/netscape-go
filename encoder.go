@@ -82,11 +82,11 @@ func newNetscapeH3(f *Folder) *netscapeH3 {
 		Name: f.Name,
 	}
 
-	if f.CreatedAt != nil {
+	if !f.CreatedAt.IsZero() {
 		h3.AddDate = fmt.Sprintf("%d", f.CreatedAt.Unix())
 	}
 
-	if f.UpdatedAt != nil {
+	if !f.UpdatedAt.IsZero() {
 		h3.LastModified = fmt.Sprintf("%d", f.UpdatedAt.Unix())
 	}
 
@@ -190,11 +190,11 @@ func newNetscapeA(b *Bookmark) *netscapeA {
 		Attrs: []xml.Attr{},
 	}
 
-	if b.CreatedAt != nil {
+	if !b.CreatedAt.IsZero() {
 		a.AddDate = fmt.Sprintf("%d", b.CreatedAt.Unix())
 	}
 
-	if b.UpdatedAt != nil {
+	if !b.UpdatedAt.IsZero() {
 		a.LastModified = fmt.Sprintf("%d", b.UpdatedAt.Unix())
 	}
 
