@@ -16,7 +16,7 @@ const (
 
 // Decode walks a Netscape Bookmark AST and returns the corresponding document.
 func Decode(f FileNode) (*Document, error) {
-	var d Decoder
+	d := NewDecoder()
 	return d.decodeFile(f)
 }
 
