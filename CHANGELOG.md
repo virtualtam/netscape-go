@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v2.1.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.1.0) - 2022-06-03
+### Changed
+
+- Do not use time.Time pointers to represent nullable dates
+- Introduce JSON marshaling methods with intermediary structs to handle nullable
+  dates (via time.Time.IsZero())
+
+### Fixed
+
+- Initialize Decoder for proper UNIX timestamp format detection
+
+
 ## [v2.0.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.0.0) - 2022-04-30
 ### Added
 
