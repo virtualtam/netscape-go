@@ -1,7 +1,7 @@
 package netscape_test
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/virtualtam/netscape-go/v2"
@@ -32,7 +32,7 @@ func BenchmarkMarshal(b *testing.B) {
 
 	for _, tc := range cases {
 		b.Run(tc.name, func(b *testing.B) {
-			bytes, err := ioutil.ReadFile(tc.filepath)
+			bytes, err := os.ReadFile(tc.filepath)
 			if err != nil {
 				b.Fatalf("failed to open file %q: %s", tc.filepath, err)
 			}
@@ -59,7 +59,7 @@ func BenchmarkUnmarshal(b *testing.B) {
 
 	for _, tc := range cases {
 		b.Run(tc.name, func(b *testing.B) {
-			bytes, err := ioutil.ReadFile(tc.filepath)
+			bytes, err := os.ReadFile(tc.filepath)
 			if err != nil {
 				b.Fatalf("failed to open file %q: %s", tc.filepath, err)
 			}
