@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v2.2.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.2.0) - 2023-10-26
+### Changed
+
+- Require Go 1.21
+- Update CI workflows
+- Marshal / encoder: HTML-escape bookmark description
+- Unmarshal / decoder: HTML-unescape bookmark description
+
+
 ## [v2.1.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.1.0) - 2022-06-03
 ### Changed
 
