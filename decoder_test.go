@@ -284,6 +284,50 @@ func TestDecodeBookmark(t *testing.T) {
 			},
 		},
 		{
+			tname: "bookmark with description containing escaped HTML characters",
+			input: BookmarkNode{
+				Description: "&#34;Fran &amp; Freddie&#39;s Diner&#34; &lt;tasty@example.com&gt;",
+				Href:        "https://domain.tld",
+				Title:       "Test Domain",
+			},
+			want: Bookmark{
+				Title:       "Test Domain",
+				URL:         "https://domain.tld",
+				Description: `"Fran & Freddie's Diner" <tasty@example.com>`,
+			},
+		},
+		{
+			tname: "bookmark with multi-line description containing escaped HTML characters",
+			input: BookmarkNode{
+				Description: `
+&gt; The format of here-documents is:
+
+` + "```shell" + `
+[n]&lt;&lt;[-]word
+        here-document
+delimiter
+` + "```" + `
+
+&gt; If any part of word is quoted, the delimiter is the result of quote removal on word, and the lines in the here-document are not expanded.`,
+				Href:  "https://domain.tld",
+				Title: "Test Domain",
+			},
+			want: Bookmark{
+				Title: "Test Domain",
+				URL:   "https://domain.tld",
+				Description: `
+> The format of here-documents is:
+
+` + "```shell" + `
+[n]<<[-]word
+        here-document
+delimiter
+` + "```" + `
+
+> If any part of word is quoted, the delimiter is the result of quote removal on word, and the lines in the here-document are not expanded.`,
+			},
+		},
+		{
 			tname: "bookmark with creation date",
 			input: BookmarkNode{
 				Href:  "https://domain.tld",

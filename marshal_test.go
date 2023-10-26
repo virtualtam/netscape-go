@@ -45,6 +45,20 @@ func TestMarshal(t *testing.T) {
 							URL:         "https://test.domain.tld",
 							Title:       "Test Domain II",
 						},
+						{
+							Description: `
+> The format of here-documents is:
+
+` + "```shell" + `
+[n]<<[-]word
+        here-document
+delimiter
+` + "```" + `
+
+> If any part of word is quoted, the delimiter is the result of quote removal on word, and the lines in the here-document are not expanded.`,
+							URL:   "https://markdown.xml",
+							Title: "Markdown Description",
+						},
 					},
 				},
 			},
@@ -58,6 +72,17 @@ func TestMarshal(t *testing.T) {
     <DT><A HREF="https://domain.tld" PRIVATE="0">Test Domain</A>
     <DT><A HREF="https://test.domain.tld" PRIVATE="0">Test Domain II</A>
     <DD>Second test
+    <DT><A HREF="https://markdown.xml" PRIVATE="0">Markdown Description</A>
+    <DD>
+&gt; The format of here-documents is:
+
+` + "```shell" + `
+[n]&lt;&lt;[-]word
+        here-document
+delimiter
+` + "```" + `
+
+&gt; If any part of word is quoted, the delimiter is the result of quote removal on word, and the lines in the here-document are not expanded.
 </DL><p>
 `,
 		},

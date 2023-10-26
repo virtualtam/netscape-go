@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/xml"
 	"fmt"
+	"html"
 	"io"
 	"sort"
 	"strings"
@@ -230,7 +231,7 @@ func (p *printer) marshalBookmark(b *Bookmark) error {
 	}
 
 	if b.Description != "" {
-		_, err = p.writeString(fmt.Sprintf("<DD>%s\n", b.Description))
+		_, err = p.writeString(fmt.Sprintf("<DD>%s\n", html.EscapeString(b.Description)))
 		if err != nil {
 			return err
 		}
