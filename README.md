@@ -1,6 +1,6 @@
 # netscape-go - Parse and export bookmarks using the Netscape format
 
-<img src="https://github.com/virtualtam/netscape-go/actions/workflows/build-and-test.yml/badge.svg?branch=main" alt="Build and test workflow status">
+<img src="https://github.com/virtualtam/netscape-go/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI workflow status"> <a href="https://pkg.go.dev/github.com/virtualtam/netscape-go/v2"><img src="https://pkg.go.dev/badge/github.com/virtualtam/netscape-go/v2.svg" alt="Go Reference"></a>
 
 `netscape-go` provides a library to marshal and unmarshal bookmark collections
 using the
