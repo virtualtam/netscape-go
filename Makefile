@@ -47,3 +47,7 @@ coverhtml: cover
 test:
 	go test ./...
 .PHONY: test
+
+fuzz:
+	go test -fuzz Fuzz
+.PHONY: fuzz

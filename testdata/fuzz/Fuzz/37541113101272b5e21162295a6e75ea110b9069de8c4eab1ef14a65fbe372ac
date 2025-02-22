@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<!-- This is an automatically generated file.\nIt will be read and overwritten.\nDo Not Edit! -->\n<TITLE>Bookmarks</TITLE>\n<H1>Bookmarks</H1>\n<DL><p>\n<DT><A HREF=\"https://private.tld\" ADD_DATE=\"10/Oct/2000:13:55:36 +0300\" PRIVATE=\"1\" TAGS=\"private secret\">Secret stuff</A>\n<DD>Super-secret stuff you're not supposed to know about\n<DT><A HREF=\"http://public.tld\" ADD_DATE=\"1456433748\" PRIVATE=\"0\" TAGS=\"public hello world\">Public stuff</A>\n</DL><p>\n")

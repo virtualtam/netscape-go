@@ -16,6 +16,11 @@ const (
 var (
 	ErrDoctypeMissing error = errors.New("missing DOCTYPE")
 	ErrDoctypeInvalid error = errors.New("invalid DOCTYPE")
+
+	ErrRootFolderMissing      error = errors.New("missing root folder (<H1> tag)")
+	ErrParentFolderMissing    error = errors.New("missing parent folder")
+	ErrFolderTitleEmpty       error = errors.New("empty folder title")
+	ErrFolderStructureInvalid error = errors.New("invalid folder structure")
 )
 
 var (
@@ -72,6 +77,7 @@ type parser struct {
 	tokenOffset int64
 
 	file            *FileNode
+	currentDepth    int
 	currentFolder   *FolderNode
 	currentBookmark *BookmarkNode
 }
@@ -127,7 +133,12 @@ func (p *parser) parse() (*FileNode, error) {
 				p.file.Root = folder
 				p.currentFolder = &p.file.Root
 			case "DL", "DT":
-				if err := p.parseBookmarks(&tokType); err != nil {
+				if p.currentFolder == nil {
+					// The document must have a <H1>...</H1> root folder.
+					return &FileNode{}, ErrRootFolderMissing
+				}
+
+				if err := p.parseBookmarks(); err != nil {
 					return &FileNode{}, err
 				}
 			}
@@ -161,6 +172,10 @@ func (p *parser) parseFolder(start *xml.StartElement) (FolderNode, error) {
 		return FolderNode{}, wrapWitParseError("failed to parse folder", p.tokenOffset, err)
 	}
 
+	if elt.Name == "" {
+		return FolderNode{}, ErrFolderTitleEmpty
+	}
+
 	p.tokenOffset = p.decoder.InputOffset()
 
 	folder := FolderNode{
@@ -175,7 +190,7 @@ func (p *parser) parseFolder(start *xml.StartElement) (FolderNode, error) {
 	return folder, nil
 }
 
-func (p *parser) parseBookmarks(start *xml.StartElement) error {
+func (p *parser) parseBookmarks() error {
 	var lastElementType string
 
 	for {
@@ -192,6 +207,11 @@ func (p *parser) parseBookmarks(start *xml.StartElement) error {
 				if err != nil {
 					return err
 				}
+
+				if p.currentFolder == nil {
+					return ErrFolderStructureInvalid
+				}
+
 				p.currentFolder.Bookmarks = append(p.currentFolder.Bookmarks, bookmark)
 				p.currentBookmark = &p.currentFolder.Bookmarks[len(p.currentFolder.Bookmarks)-1]
 				lastElementType = "A"
@@ -213,13 +233,25 @@ func (p *parser) parseBookmarks(start *xml.StartElement) error {
 					return err
 				}
 
+				if p.currentFolder == nil {
+					return ErrFolderStructureInvalid
+				}
+
 				folder.Parent = p.currentFolder
 				p.currentFolder.Subfolders = append(p.currentFolder.Subfolders, folder)
 				p.currentFolder = &p.currentFolder.Subfolders[len(p.currentFolder.Subfolders)-1]
+				p.currentDepth++
+
 				lastElementType = "H3"
 			}
 		case xml.EndElement:
-			if tokType.Name.Local == "DL" {
+			switch tokType.Name.Local {
+			case "DL":
+				if p.currentDepth < 0 {
+					return ErrFolderStructureInvalid
+				}
+
+				p.currentDepth--
 				p.currentFolder = p.currentFolder.Parent
 			}
 		}

@@ -6,9 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - UNRELEASED
+### Added
+
+- Add Go fuzzing corpus
+
 ### Changed
 
 - Require Go 1.24
+- Fix nil pointer dereference issues detected by fuzzing
 
 
 ## [v2.2.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.2.0) - 2023-10-26

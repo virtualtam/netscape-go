@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<!DOCTYPE NETSCAPE-Bookmark-file-1><DT><A></A>")
