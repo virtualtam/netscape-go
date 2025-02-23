@@ -14,6 +14,7 @@ project adheres to [Semantic Versioning](https://semver.org/).
 
 - Require Go 1.24
 - Fix nil pointer dereference issues detected by fuzzing
+- Relocate benchmark input to `testdata/benchmark/`
 
 
 ## [v2.2.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.2.0) - 2023-10-26

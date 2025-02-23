@@ -14,15 +14,15 @@ var (
 	}{
 		{
 			name:     "flat: 100 bookmarks",
-			filepath: "testdata/flat100.htm",
+			filepath: "testdata/benchmark/flat100.htm",
 		},
 		{
 			name:     "flat: 1000 bookmarks",
-			filepath: "testdata/flat1000.htm",
+			filepath: "testdata/benchmark/flat1000.htm",
 		},
 		{
 			name:     "flat: 10000 bookmarks",
-			filepath: "testdata/flat10000.htm",
+			filepath: "testdata/benchmark/flat10000.htm",
 		},
 	}
 )
