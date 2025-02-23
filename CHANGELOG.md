@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - UNRELEASED
+## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - 2025-02-23
 ### Added
 
 - Add Go fuzzing corpus
