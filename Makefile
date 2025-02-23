@@ -48,6 +48,10 @@ test:
 	go test ./...
 .PHONY: test
 
+file2fuzz:
+	go tool file2fuzz -o testdata/fuzz/Fuzz/ testdata/input/*
+.PHONY: file2fuzz
+
 fuzz:
 	go test -fuzz Fuzz
 .PHONY: fuzz

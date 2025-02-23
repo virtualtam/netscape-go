@@ -9,6 +9,7 @@ project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Add Go fuzzing corpus
+- Add Make target to seed the fuzzing corpus from test input data
 
 ### Changed
 
