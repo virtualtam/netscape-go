@@ -362,6 +362,38 @@ func TestParse(t *testing.T) {
 <H1>Bookma`,
 			wantErr: newParseError("failed to parse folder", 60, &xml.SyntaxError{Msg: "unexpected EOF", Line: 2}),
 		},
+
+		// error cases detected with fuzzing
+		{
+			tname:   "testdata/fuzz/Fuzz/5e841755a8981807",
+			input:   "<!DOCTYPE NETSCAPE-Bookmark-file-1>0<H1></H1><DL><DL></A>0",
+			wantErr: newParseError("failed to parse folder", 35, ErrFolderTitleEmpty),
+		},
+		{
+			tname:   "testdata/fuzz/Fuzz/8f1a6e2b338c9b72",
+			input:   "<!DOCTYPE NETSCAPE-Bookmark-file-1><H1>0</H1><DL></DL><A></A0>",
+			wantErr: newParseError("failed to parse bookmarks", 62, ErrFolderStructureInvalid),
+		},
+		{
+			tname:   "testdata/fuzz/Fuzz/80aa58f529764f6b",
+			input:   "<!DOCTYPE NETSCAPE-Bookmark-file-1><H1>0</H1><DL><DL></A>0",
+			wantErr: newParseError("failed to parse bookmarks", 45, ErrFolderStructureInvalid),
+		},
+		{
+			tname:   "testdata/fuzz/Fuzz/269c29ee022dd350",
+			input:   "<!DOCTYPE NETSCAPE-Bookmark-file-1><DT><A></A>",
+			wantErr: newParseError("failed to parse bookmarks", 35, ErrRootFolderMissing),
+		},
+		{
+			tname:   "testdata/fuzz/Fuzz/a0db6c3d8126e7b7",
+			input:   "<!DOCTYPE NETSCAPE-Bookmark-file-1><H1></H1><DL><DL></A>",
+			wantErr: newParseError("failed to parse folder", 35, ErrFolderTitleEmpty),
+		},
+		{
+			tname:   "testdata/fuzz/Fuzz/dc4dee8a9080d790",
+			input:   "<!DOCTYPE NETSCAPE-Bookmark-file-1>0<H1></H1><DL><DL></A>0",
+			wantErr: newParseError("failed to parse folder", 35, ErrFolderTitleEmpty),
+		},
 	}
 
 	for _, tc := range cases {

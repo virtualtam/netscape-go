@@ -140,7 +140,7 @@ func (p *parser) parse() (*FileNode, error) {
 			case "DL", "DT":
 				if p.currentFolder == nil {
 					// The document must have a <H1>...</H1> root folder.
-					return &FileNode{}, ErrRootFolderMissing
+					return &FileNode{}, newParseError("failed to parse bookmarks", p.tokenOffset, ErrRootFolderMissing)
 				}
 
 				if err := p.parseBookmarks(); err != nil {
@@ -178,7 +178,7 @@ func (p *parser) parseFolder(start *xml.StartElement) (FolderNode, error) {
 	}
 
 	if elt.Name == "" {
-		return FolderNode{}, ErrFolderTitleEmpty
+		return FolderNode{}, newParseError("failed to parse folder", p.tokenOffset, ErrFolderTitleEmpty)
 	}
 
 	p.tokenOffset = p.decoder.InputOffset()
@@ -214,7 +214,7 @@ func (p *parser) parseBookmarks() error {
 				}
 
 				if p.currentFolder == nil {
-					return ErrFolderStructureInvalid
+					return newParseError("failed to parse bookmarks", p.tokenOffset, ErrFolderStructureInvalid)
 				}
 
 				p.currentFolder.Bookmarks = append(p.currentFolder.Bookmarks, bookmark)
@@ -239,7 +239,7 @@ func (p *parser) parseBookmarks() error {
 				}
 
 				if p.currentFolder == nil {
-					return ErrFolderStructureInvalid
+					return newParseError("failed to parse H3 subfolder", p.tokenOffset, ErrFolderStructureInvalid)
 				}
 
 				folder.Parent = p.currentFolder
@@ -253,7 +253,7 @@ func (p *parser) parseBookmarks() error {
 			switch tokType.Name.Local {
 			case "DL":
 				if p.currentDepth < 0 {
-					return ErrFolderStructureInvalid
+					return newParseError("failed to parse bookmarks", p.tokenOffset, ErrFolderStructureInvalid)
 				}
 
 				p.currentDepth--
