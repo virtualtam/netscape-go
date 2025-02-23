@@ -10,6 +10,7 @@ project adheres to [Semantic Versioning](https://semver.org/).
 
 - Add Go fuzzing corpus
 - Add Make target to seed the fuzzing corpus from test input data
+- Setup Copywrite to manage license headers
 
 ### Changed
 

@@ -1,3 +1,6 @@
+// Copyright (c) VirtualTam
+// SPDX-License-Identifier: MIT
+
 // Package netscape provides utilities to parse and export Web bookmarks using
 // the Netscape Bookmark format.
 package netscape

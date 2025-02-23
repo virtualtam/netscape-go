@@ -1,3 +1,6 @@
+// Copyright (c) VirtualTam
+// SPDX-License-Identifier: MIT
+
 package netscape
 
 // A FileNode represents a Netscape Bookmark file.

@@ -55,3 +55,13 @@ file2fuzz:
 fuzz:
 	go test -fuzz Fuzz
 .PHONY: fuzz
+
+# Install development tools
+dev-install-tools:
+	go install github.com/hashicorp/copywrite@latest
+.PHONY: dev-install-tools
+
+# Licence headers
+copywrite:
+	copywrite headers
+.PHONY: copywrite
