@@ -353,14 +353,14 @@ func TestParse(t *testing.T) {
 			tname: "incomplete TITLE",
 			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <TITLE>Bookmarks`,
-			wantErr: wrapWitParseError("failed to parse title", 35, &xml.SyntaxError{Msg: "unexpected EOF", Line: 2}),
+			wantErr: newParseError("failed to parse title", 35, &xml.SyntaxError{Msg: "unexpected EOF", Line: 2}),
 		},
 		{
 			tname: "incomplete H1",
 			input: `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <TITLE>Bookmarks</TITLE>
 <H1>Bookma`,
-			wantErr: wrapWitParseError("failed to parse folder", 60, &xml.SyntaxError{Msg: "unexpected EOF", Line: 2}),
+			wantErr: newParseError("failed to parse folder", 60, &xml.SyntaxError{Msg: "unexpected EOF", Line: 2}),
 		},
 	}
 
