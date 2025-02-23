@@ -710,7 +710,7 @@ func TestParseFile(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.tname, func(t *testing.T) {
-			file, err := os.Open(filepath.Join("testdata", tc.inputFilename))
+			file, err := os.Open(filepath.Join("testdata", "input", tc.inputFilename))
 			if err != nil {
 				t.Fatalf("failed to open input file %s: %s", tc.inputFilename, err)
 			}
