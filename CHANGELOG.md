@@ -15,6 +15,7 @@ project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Require Go 1.24
+- Update CI workflow
 - Fix nil pointer dereference issues detected by fuzzing
 - Relocate benchmark input to `testdata/benchmark/`
 - Relocate test input to `testdata/input/`
