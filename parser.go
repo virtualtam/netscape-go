@@ -17,22 +17,15 @@ const (
 )
 
 var (
-	ErrDoctypeMissing error = errors.New("missing DOCTYPE")
-	ErrDoctypeInvalid error = errors.New("invalid DOCTYPE")
+	ErrDoctypeMissing = errors.New("missing DOCTYPE")
+	ErrDoctypeInvalid = errors.New("invalid DOCTYPE")
 
-	ErrRootFolderMissing      error = errors.New("missing root folder (<H1> tag)")
-	ErrParentFolderMissing    error = errors.New("missing parent folder")
-	ErrFolderTitleEmpty       error = errors.New("empty folder title")
-	ErrFolderStructureInvalid error = errors.New("invalid folder structure")
+	ErrRootFolderMissing      = errors.New("missing root folder (<H1> tag)")
+	ErrFolderTitleEmpty       = errors.New("empty folder title")
+	ErrFolderStructureInvalid = errors.New("invalid folder structure")
 )
 
-var (
-	// UTF-8 Byte Order Mark.
-	utf8bom = []byte{0xef, 0xbb, 0xbf}
-)
-
-// A ParseError is returned when we fail to parse a Netscape Bookmark token or XML
-// element.
+// A ParseError is returned when we fail to parse a Netscape Bookmark token or XML element.
 type ParseError struct {
 	// Custom message for this ParseError.
 	Msg string
@@ -59,8 +52,8 @@ func (e *ParseError) Error() string {
 
 // Is compares this Error with a target error to satisfy an equality check.
 func (e *ParseError) Is(target error) bool {
-	t, ok := target.(*ParseError)
-	if !ok {
+	var t *ParseError
+	if ok := errors.As(target, &t); !ok {
 		return false
 	}
 
@@ -74,13 +67,13 @@ func (e *ParseError) Unwrap() error {
 
 // Parse reads a Netscape Bookmark document and processes it token by token to
 // build and return the corresponding AST.
-func Parse(readseeker io.ReadSeeker) (*FileNode, error) {
-	p := newParser(readseeker)
+func Parse(rs io.ReadSeeker) (*FileNode, error) {
+	p := newParser(rs)
 	return p.parse()
 }
 
 type parser struct {
-	readseeker  io.ReadSeeker
+	rs          io.ReadSeeker
 	decoder     *xml.Decoder
 	tokenOffset int64
 
@@ -103,14 +96,14 @@ func newXMLDecoder(reader io.Reader) *xml.Decoder {
 	return decoder
 }
 
-func newParser(readseeker io.ReadSeeker) *parser {
-	decoder := newXMLDecoder(readseeker)
+func newParser(rs io.ReadSeeker) *parser {
+	decoder := newXMLDecoder(rs)
 	file := &FileNode{}
 
 	return &parser{
-		readseeker: readseeker,
-		decoder:    decoder,
-		file:       file,
+		rs:      rs,
+		decoder: decoder,
+		file:    file,
 	}
 }
 
@@ -306,7 +299,7 @@ func (p *parser) parseDescription() (string, error) {
 	startOffset := p.decoder.InputOffset()
 	endOffset := startOffset
 
-	var readseekOffset int64
+	var rsOffset int64
 
 	// As the description may contain either text or HTML elements, we do not
 	// directly process the stream of XML tokens, and instead look for the start
@@ -336,7 +329,7 @@ loop:
 		}
 	}
 
-	readseekOffset, err := p.readseeker.Seek(0, io.SeekCurrent)
+	rsOffset, err := p.rs.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return "", err
 	}
@@ -344,12 +337,12 @@ loop:
 	dataLen := int(endOffset - startOffset)
 
 	data := make([]byte, dataLen)
-	_, err = p.readseeker.Seek(startOffset, io.SeekStart)
+	_, err = p.rs.Seek(startOffset, io.SeekStart)
 	if err != nil {
-		return "", fmt.Errorf("description: failed to reset readseeker position to %d: %w", startOffset, err)
+		return "", fmt.Errorf("description: failed to reset rs position to %d: %w", startOffset, err)
 	}
 
-	nRead, err := p.readseeker.Read(data)
+	nRead, err := p.rs.Read(data)
 	if err != nil {
 		return "", fmt.Errorf("description: failed to read data in range [%d:%d]: %w", startOffset, endOffset, err)
 	}
@@ -359,15 +352,20 @@ loop:
 	}
 
 	// reset the io.ReadSeeker position
-	_, err = p.readseeker.Seek(readseekOffset, io.SeekStart)
+	_, err = p.rs.Seek(rsOffset, io.SeekStart)
 	if err != nil {
-		return "", fmt.Errorf("description: failed to reset readseeker position to %d: %w", startOffset, err)
+		return "", fmt.Errorf("description: failed to reset rs position to %d: %w", startOffset, err)
 	}
 
 	// sanitize data
 	description := strings.TrimSpace(string(data))
 	return description, nil
 }
+
+var (
+	// UTF-8 Byte Order Mark.
+	utf8bom = []byte{0xef, 0xbb, 0xbf}
+)
 
 func (p *parser) verifyDoctype() error {
 	for {

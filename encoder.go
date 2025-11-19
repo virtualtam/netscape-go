@@ -43,7 +43,7 @@ type printer struct {
 }
 
 func (p *printer) writeString(s string) (int, error) {
-	for i := 0; i < p.depth; i++ {
+	for range p.depth {
 		if n, err := p.WriteString(p.indent); err != nil {
 			return n, err
 		}
@@ -58,8 +58,7 @@ func (p *printer) marshalDocument(d *Document) error {
      It will be read and overwritten.
      DO NOT EDIT! -->`
 
-	_, err := p.WriteString(fmt.Sprintf("%s\n<TITLE>%s</TITLE>\n", header, d.Title))
-	if err != nil {
+	if _, err := fmt.Fprintf(p, "%s\n<TITLE>%s</TITLE>\n", header, d.Title); err != nil {
 		return err
 	}
 

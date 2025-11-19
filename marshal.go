@@ -7,6 +7,7 @@ package netscape
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"os"
 	"strings"
@@ -32,12 +33,16 @@ func Unmarshal(b []byte) (*Document, error) {
 
 // UnmarshalFile unmarshals a Netscape Bookmark file and returns the
 // corresponding Document.
-func UnmarshalFile(filePath string) (*Document, error) {
+func UnmarshalFile(filePath string) (d *Document, err error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return &Document{}, err
 	}
-	defer file.Close()
+	defer func() {
+		if err2 := file.Close(); err2 != nil {
+			err = errors.Join(err, err2)
+		}
+	}()
 
 	return unmarshal(file)
 }

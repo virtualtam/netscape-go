@@ -47,7 +47,7 @@ func BenchmarkMarshal(b *testing.B) {
 
 			b.ResetTimer()
 
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				_, err := netscape.Marshal(document)
 				if err != nil {
 					b.Fatalf("failed to marshal document: %s", err)
@@ -69,7 +69,7 @@ func BenchmarkUnmarshal(b *testing.B) {
 
 			b.ResetTimer()
 
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				_, err := netscape.Unmarshal(bytes)
 				if err != nil {
 					b.Fatalf("failed to open file %q: %s", tc.filepath, err)

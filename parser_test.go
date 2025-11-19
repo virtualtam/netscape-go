@@ -717,7 +717,11 @@ func TestParseFile(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to open input file %s: %s", tc.inputFilename, err)
 			}
-			defer file.Close()
+			defer func() {
+				if err := file.Close(); err != nil {
+					t.Fatalf("failed to close input file %s: %s", tc.inputFilename, err)
+				}
+			}()
 
 			got, err := Parse(file)
 

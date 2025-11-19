@@ -107,7 +107,7 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 	return folder, nil
 }
 
-func (d Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
+func (d *Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
 	bookmark := Bookmark{
 		Description: html.UnescapeString(b.Description),
 		URL:         b.Href,

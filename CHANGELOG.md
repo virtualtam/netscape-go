@@ -9,6 +9,7 @@ project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Require Go 1.25
+- Modernize Go code
 
 ## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - 2025-02-23
 ### Added
