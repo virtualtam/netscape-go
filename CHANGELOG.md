@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this 
 
 ### Performance
 - Only allocate attribute maps for bookmarks and folders when present
+- Pre-allocate slices for bookmarks and subfolders
 
 ## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - 2025-02-23
 ### Added

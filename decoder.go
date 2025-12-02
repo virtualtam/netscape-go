@@ -88,6 +88,9 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 		}
 	}
 
+	if len(f.Bookmarks) > 0 {
+		folder.Bookmarks = make([]Bookmark, 0, len(f.Bookmarks))
+	}
 	for _, b := range f.Bookmarks {
 		bookmark, err := d.decodeBookmark(b)
 		if err != nil {
@@ -97,6 +100,9 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 		folder.Bookmarks = append(folder.Bookmarks, bookmark)
 	}
 
+	if len(f.Subfolders) > 0 {
+		folder.Subfolders = make([]Folder, 0, len(f.Subfolders))
+	}
 	for _, sf := range f.Subfolders {
 		subfolder, err := d.decodeFolder(sf)
 		if err != nil {
