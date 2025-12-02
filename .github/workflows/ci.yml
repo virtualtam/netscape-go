@@ -36,10 +36,10 @@ jobs:
           go-version-file: go.mod
 
       - name: Lint Go sources
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
           args: --timeout=10m
-          version: "v1.64.5"
+          version: "v2.6.2"
 
   test:
     runs-on: ubuntu-latest

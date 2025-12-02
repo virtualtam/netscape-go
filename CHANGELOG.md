@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this 
 - Require Go 1.25
 - Modernize Go code
 - Update Make target to install the `benchstat` tool
+- Bump golangci-lint to v2.6.2
 
 ## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - 2025-02-23
 ### Added
