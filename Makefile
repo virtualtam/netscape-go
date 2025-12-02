@@ -58,6 +58,7 @@ fuzz:
 
 # Install development tools
 dev-install-tools:
+	go install golang.org/x/perf/cmd/benchstat@latest
 	go install github.com/hashicorp/copywrite@latest
 .PHONY: dev-install-tools
 

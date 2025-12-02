@@ -2,14 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/) and this
-project adheres to [Semantic Versioning](https://semver.org/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 ### Changed
 
 - Require Go 1.25
 - Modernize Go code
+- Update Make target to install the `benchstat` tool
 
 ## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - 2025-02-23
 ### Added
