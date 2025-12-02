@@ -180,12 +180,14 @@ func (p *parser) parseFolder(start *xml.StartElement) (FolderNode, error) {
 	p.tokenOffset = p.decoder.InputOffset()
 
 	folder := FolderNode{
-		Name:       elt.Name,
-		Attributes: map[string]string{},
+		Name: elt.Name,
 	}
 
-	for _, attr := range start.Attr {
-		folder.Attributes[attr.Name.Local] = attr.Value
+	if len(start.Attr) > 0 {
+		folder.Attributes = make(map[string]string, len(start.Attr))
+		for _, attr := range start.Attr {
+			folder.Attributes[attr.Name.Local] = attr.Value
+		}
 	}
 
 	return folder, nil
@@ -273,8 +275,7 @@ func (p *parser) parseBookmark(start *xml.StartElement) (BookmarkNode, error) {
 	p.tokenOffset = p.decoder.InputOffset()
 
 	bookmark := BookmarkNode{
-		Title:      link.Title,
-		Attributes: map[string]string{},
+		Title: link.Title,
 	}
 
 	for _, attr := range start.Attr {
@@ -283,6 +284,9 @@ func (p *parser) parseBookmark(start *xml.StartElement) (BookmarkNode, error) {
 			continue
 		}
 
+		if bookmark.Attributes == nil {
+			bookmark.Attributes = make(map[string]string, len(start.Attr)-1)
+		}
 		bookmark.Attributes[attr.Name.Local] = attr.Value
 	}
 

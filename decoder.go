@@ -61,7 +61,6 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 	folder := Folder{
 		Name:        f.Name,
 		Description: f.Description,
-		Attributes:  map[string]string{},
 	}
 
 	for attr, value := range f.Attributes {
@@ -82,6 +81,9 @@ func (d *Decoder) decodeFolder(f FolderNode) (Folder, error) {
 			}
 			folder.UpdatedAt = updatedAt
 		default:
+			if folder.Attributes == nil {
+				folder.Attributes = make(map[string]string, len(f.Attributes))
+			}
 			folder.Attributes[attr] = value
 		}
 	}
@@ -112,7 +114,6 @@ func (d *Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
 		Description: html.UnescapeString(b.Description),
 		URL:         b.Href,
 		Title:       b.Title,
-		Attributes:  map[string]string{},
 	}
 
 	for attr, value := range b.Attributes {
@@ -139,6 +140,9 @@ func (d *Decoder) decodeBookmark(b BookmarkNode) (Bookmark, error) {
 		case tagsAttr:
 			bookmark.Tags = d.decodeTags(b.Attributes)
 		default:
+			if bookmark.Attributes == nil {
+				bookmark.Attributes = make(map[string]string, len(b.Attributes))
+			}
 			bookmark.Attributes[attr] = value
 		}
 	}
