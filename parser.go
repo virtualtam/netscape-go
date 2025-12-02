@@ -81,6 +81,8 @@ type parser struct {
 	currentDepth    int
 	currentFolder   *FolderNode
 	currentBookmark *BookmarkNode
+
+	descriptionBuf []byte
 }
 
 // newXMLDecoder initializes and returns a xml.Decoder with strict mode disabled,
@@ -340,13 +342,19 @@ loop:
 	// read raw data between start and end offsets
 	dataLen := int(endOffset - startOffset)
 
-	data := make([]byte, dataLen)
+	// reuse buffer if large enough, otherwise grow it
+	if cap(p.descriptionBuf) >= dataLen {
+		p.descriptionBuf = p.descriptionBuf[:dataLen]
+	} else {
+		p.descriptionBuf = make([]byte, dataLen)
+	}
+
 	_, err = p.rs.Seek(startOffset, io.SeekStart)
 	if err != nil {
 		return "", fmt.Errorf("description: failed to reset rs position to %d: %w", startOffset, err)
 	}
 
-	nRead, err := p.rs.Read(data)
+	nRead, err := p.rs.Read(p.descriptionBuf)
 	if err != nil {
 		return "", fmt.Errorf("description: failed to read data in range [%d:%d]: %w", startOffset, endOffset, err)
 	}
@@ -362,7 +370,7 @@ loop:
 	}
 
 	// sanitize data
-	description := strings.TrimSpace(string(data))
+	description := strings.TrimSpace(string(p.descriptionBuf))
 	return description, nil
 }
 
