@@ -12,10 +12,6 @@ import (
 	"strings"
 )
 
-const (
-	NetscapeBookmarkDoctype string = "NETSCAPE-Bookmark-file-1"
-)
-
 var (
 	ErrDoctypeMissing = errors.New("missing DOCTYPE")
 	ErrDoctypeInvalid = errors.New("invalid DOCTYPE")
@@ -379,6 +375,14 @@ var (
 	utf8bom = []byte{0xef, 0xbb, 0xbf}
 )
 
+const (
+	// NetscapeBookmarkDoctype is the expected DOCTYPE string for Netscape bookmark files.
+	NetscapeBookmarkDoctype string = "NETSCAPE-Bookmark-file-1"
+
+	// xmlDoctypeTokenType is the expected XML directive for Netscape bookmark files.
+	xmlDoctypeTokenType string = "DOCTYPE " + NetscapeBookmarkDoctype
+)
+
 func (p *parser) verifyDoctype() error {
 	for {
 		tok, err := p.decoder.Token()
@@ -397,8 +401,8 @@ func (p *parser) verifyDoctype() error {
 			return newParseError("unexpected character data", p.tokenOffset, ErrDoctypeInvalid)
 
 		case xml.Directive:
-			if string(tokType) != fmt.Sprintf("DOCTYPE %s", NetscapeBookmarkDoctype) {
-				return newParseError(fmt.Sprintf("unknown DOCTYPE %s", string(tokType)), p.tokenOffset, ErrDoctypeInvalid)
+			if string(tokType) != xmlDoctypeTokenType {
+				return newParseError("unknown DOCTYPE "+string(tokType), p.tokenOffset, ErrDoctypeInvalid)
 			}
 			return nil
 

@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this 
 - Only allocate attribute maps for bookmarks and folders when present
 - Pre-allocate slices for bookmarks and subfolders
 - Add a reusable buffer for parsing descriptions
+- Avoid re-computing the expected DOCTYPE string at runtime
 
 ## [v2.3.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.3.0) - 2025-02-23
 ### Added
