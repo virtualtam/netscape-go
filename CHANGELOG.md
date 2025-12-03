@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## [v2.4.0](https://github.com/virtualtam/netscape-go/releases/tag/v2.4.0) - 2025-12-03
 ### Changed
 
 - Require Go 1.25
